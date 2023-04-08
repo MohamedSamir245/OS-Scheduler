@@ -2,74 +2,6 @@
 
 void clearResources(int);
 
-struct Process
-{
-    int id;
-    int executionTime;
-    int priority;
-    int arrivalTime;
-    int finishTime;
-    int remainingTime;
-};
-
-void Process__init(struct Process *self, int id, int ar, int run, int p)
-{
-    self->arrivalTime = ar;
-    self->priority = p;
-    self->executionTime = run;
-    self->id = id;
-    self->remainingTime = run;
-}
-
-struct Process *Process__create(int id, int ar, int run, int p)
-{
-    struct Process *result = (struct Process *)malloc(sizeof(struct Process));
-    Process__init(result, id, ar, run, p);
-    return result;
-}
-
-void Process__reset(struct Process *self)
-{
-}
-
-void Process__destroy(struct Process *process)
-{
-    if (process)
-    {
-        Process__reset(process);
-        free(process);
-    }
-}
-
-int Process__excutionTime(struct Process *self)
-{
-    return self->executionTime;
-}
-
-int Process__arrivalTime(struct Process *self)
-{
-    return self->arrivalTime;
-}
-
-int Process__remainingTime(struct Process *self)
-{
-    return self->remainingTime;
-}
-
-int Process__finishTime(struct Process *self)
-{
-    return self->finishTime;
-}
-
-int Process__priority(struct Process *self)
-{
-    return self->priority;
-}
-
-int Process__id(struct Process *self)
-{
-    return self->id;
-}
 
 int main(int argc, char *argv[])
 {
@@ -143,7 +75,7 @@ int main(int argc, char *argv[])
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     // 3. Initiate and create the scheduler and clock processes.//////////////check this
     // 4. Use this function after creating the clock process to initialize clock
-    system("gnome-terminal -e './clkScript.sh'");
+    system("'./clkScript.sh' &");
     initClk();
     // To get time use this
     int x = getClk();

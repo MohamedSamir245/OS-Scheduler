@@ -1,16 +1,5 @@
 #include "headers.h"
 
-// KKKKKKKKKKKKK
-struct Process
-{
-    int id;
-    int executionTime;
-    int priority;
-    int arrivalTime;
-    int finishTime;
-    int remainingTime;
-};
-// KKKKKKKKKKKKK
 
 
 int algo;
@@ -39,7 +28,7 @@ Node* newNode(struct Process* p, int x)
 } 
   
 // Return the value at head 
-int peek(Node** head) 
+struct Process* peek(Node** head) 
 { 
     return (*head)->data; 
 } 
@@ -54,7 +43,7 @@ void pop(Node** head)
 } 
   
 // Function to push according to priority 
-void push(Node** head, struct process* P, int x) 
+void push(Node** head, struct Process* P, int x) 
 { 
     Node* start = (*head); 
   
@@ -91,6 +80,7 @@ int isEmpty(Node** head)
 { 
     return (*head) == NULL; 
 } 
+
 
 
 int main(int argc, char * argv[])

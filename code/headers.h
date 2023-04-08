@@ -18,6 +18,84 @@ typedef short bool;
 #define SHKEY 300
 
 
+// ======================================
+// ===========  Process =================
+// ======================================
+
+struct Process
+{
+    int id;
+    int executionTime;
+    int priority;
+    int arrivalTime;
+    int finishTime;
+    int remainingTime;
+};
+
+void Process__init(struct Process *self, int id, int ar, int run, int p)
+{
+    self->arrivalTime = ar;
+    self->priority = p;
+    self->executionTime = run;
+    self->id = id;
+    self->remainingTime = run;
+}
+
+struct Process *Process__create(int id, int ar, int run, int p)
+{
+    struct Process *result = (struct Process *)malloc(sizeof(struct Process));
+    Process__init(result, id, ar, run, p);
+    return result;
+}
+
+void Process__reset(struct Process *self)
+{
+}
+
+void Process__destroy(struct Process *process)
+{
+    if (process)
+    {
+        Process__reset(process);
+        free(process);
+    }
+}
+
+int Process__excutionTime(struct Process *self)
+{
+    return self->executionTime;
+}
+
+int Process__arrivalTime(struct Process *self)
+{
+    return self->arrivalTime;
+}
+
+int Process__remainingTime(struct Process *self)
+{
+    return self->remainingTime;
+}
+
+int Process__finishTime(struct Process *self)
+{
+    return self->finishTime;
+}
+
+int Process__priority(struct Process *self)
+{
+    return self->priority;
+}
+
+int Process__id(struct Process *self)
+{
+    return self->id;
+}
+
+// ======================================
+// ======================================
+// ======================================
+
+
 ///==============================
 //don't mess with this variable//
 int * shmaddr;                 //
@@ -40,7 +118,7 @@ void initClk()
     int shmid = shmget(SHKEY, 4, 0444);
     while ((int)shmid == -1)
     {
-        //Make sure that the clock exists
+        // Make sure that the clock exists
         printf("Wait! The clock not initialized yet!\n");
         sleep(1);
         shmid = shmget(SHKEY, 4, 0444);

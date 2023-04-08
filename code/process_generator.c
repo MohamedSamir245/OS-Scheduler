@@ -5,7 +5,6 @@ void clearResources(int);
 
 int main(int argc, char *argv[])
 {
-    // Test Area
 
     struct Process *processes[10];
 
@@ -67,8 +66,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    //
-
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
@@ -98,6 +95,7 @@ int main(int argc, char *argv[])
         if (processes[pIdx]->arrivalTime == x)
         {
             printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
+            // here we send it to the scheduler
             pIdx++;
         }
     }

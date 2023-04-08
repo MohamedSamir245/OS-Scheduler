@@ -102,20 +102,20 @@ int Process__id(struct Process *self)
 // ======================================
 
 // Node 
-typedef struct node { 
+struct Node { 
     struct Process* data; 
   
     // Lower values indicate higher priority 
     int priority; 
   
-    struct node* next; 
+    struct Node* next; 
   
-} Node; 
+};
   
 // Function to Create A New Node 
-Node* newNode(struct Process* p, int x) 
+struct Node* newNode(struct Process* p, int x) 
 { 
-    Node* temp = (Node*)malloc(sizeof(Node)); 
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node)); 
     temp->data = p; 
     temp->priority = x; 
     temp->next = NULL; 
@@ -124,27 +124,27 @@ Node* newNode(struct Process* p, int x)
 } 
   
 // Return the value at head 
-struct Process* peek(Node** head) 
+struct Process* peek(struct Node** head) 
 { 
     return (*head)->data; 
 } 
   
 // Removes the element with the 
 // highest priority from the list 
-void pop(Node** head) 
+void pop(struct Node** head) 
 { 
-    Node* temp = *head; 
+    struct Node* temp = *head; 
     (*head) = (*head)->next; 
     free(temp); 
 } 
   
 // Function to push according to priority 
-void push(Node** head, struct Process* P, int x) 
+void push(struct Node** head, struct Process* P, int x) 
 { 
-    Node* start = (*head); 
+    struct Node* start = (*head); 
   
     // Create new Node 
-    Node* temp = newNode(P, x); 
+    struct Node* temp = newNode(P, x); 
   
     // Special Case: The head of list has lesser 
     // priority than new node. So insert new 
@@ -172,7 +172,7 @@ void push(Node** head, struct Process* P, int x)
 } 
   
 // Function to check is list is empty 
-int isEmpty(Node** head) 
+int isEmpty(struct Node** head) 
 { 
     return (*head) == NULL; 
 } 

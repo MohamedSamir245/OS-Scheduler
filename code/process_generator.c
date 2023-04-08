@@ -2,7 +2,6 @@
 
 void clearResources(int);
 
-
 int main(int argc, char *argv[])
 {
 
@@ -92,7 +91,7 @@ int main(int argc, char *argv[])
 
         printf("current time is %d\n", x);
 
-        if (processes[pIdx]->arrivalTime == x)
+        while (pIdx < 10 && processes[pIdx]->arrivalTime == x)
         {
             printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
             // here we send it to the scheduler

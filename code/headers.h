@@ -1,4 +1,4 @@
-#include <stdio.h>      //if you don't use scanf/printf change this include
+#include <stdio.h> //if you don't use scanf/printf change this include
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
@@ -16,7 +16,6 @@ typedef short bool;
 #define false 0
 
 #define SHKEY 300
-
 
 // ======================================
 // ===========  Process =================
@@ -50,6 +49,16 @@ struct Process *Process__create(int id, int ar, int run, int p)
 
 void Process__reset(struct Process *self)
 {
+}
+
+void Process__setFinishT(struct Process *self, int fTime)
+{
+    self->finishTime = fTime;
+}
+
+void Process__setRemainingT(struct Process *self, int rTime)
+{
+    self->remainingTime = rTime;
 }
 
 void Process__destroy(struct Process *process)
@@ -95,109 +104,106 @@ int Process__id(struct Process *self)
 // ======================================
 // ======================================
 
-
-
 // ======================================
 // =============  Queue =================
 // ======================================
 
-// Node 
-struct Node { 
-    struct Process* data; 
-  
-    // Lower values indicate higher priority 
-    int priority; 
-  
-    struct Node* next; 
-  
-};
-  
-// Function to Create A New Node 
-struct Node* newNode(struct Process* p, int x) 
-{ 
-    struct Node* temp = (struct Node*)malloc(sizeof(struct Node)); 
-    temp->data = p; 
-    temp->priority = x; 
-    temp->next = NULL; 
-  
-    return temp; 
-} 
-  
-// Return the value at head 
-struct Process* peek(struct Node** head) 
-{ 
-    return (*head)->data; 
-} 
-  
-// Removes the element with the 
-// highest priority from the list 
-void pop(struct Node** head) 
-{ 
-    struct Node* temp = *head; 
-    (*head) = (*head)->next; 
-    free(temp); 
-} 
-  
-// Function to push according to priority 
-void push(struct Node** head, struct Process* P, int x) 
-{ 
-    struct Node* start = (*head); 
-  
-    // Create new Node 
-    struct Node* temp = newNode(P, x); 
-  
-    // Special Case: The head of list has lesser 
-    // priority than new node. So insert new 
-    // node before head node and change head node. 
-    if ((*head)->priority > x) { 
-  
-        // Insert New Node before head 
-        temp->next = *head; 
-        (*head) = temp; 
-    } 
-    else { 
-  
-        // Traverse the list and find a 
-        // position to insert new node 
-        while (start->next != NULL && 
-            start->next->priority < x) { 
-            start = start->next; 
-        } 
-  
-        // Either at the ends of the list 
-        // or at required position 
-        temp->next = start->next; 
-        start->next = temp; 
-    } 
-} 
-  
-// Function to check is list is empty 
-int isEmpty(struct Node** head) 
-{ 
-    return (*head) == NULL; 
-} 
-// ======================================
-// ======================================
-// ======================================
+// Node
+struct Node
+{
+    struct Process *data;
 
+    // Lower values indicate higher priority
+    int priority;
+
+    struct Node *next;
+};
+
+// Function to Create A New Node
+struct Node *newNode(struct Process *p, int x)
+{
+    struct Node *temp = (struct Node *)malloc(sizeof(struct Node));
+    temp->data = p;
+    temp->priority = x;
+    temp->next = NULL;
+
+    return temp;
+}
+
+// Return the value at head
+struct Process *peek(struct Node **head)
+{
+    return (*head)->data;
+}
+
+// Removes the element with the
+// highest priority from the list
+void pop(struct Node **head)
+{
+    struct Node *temp = *head;
+    (*head) = (*head)->next;
+    free(temp);
+}
+
+// Function to push according to priority
+void push(struct Node **head, struct Process *P, int x)
+{
+    struct Node *start = (*head);
+
+    // Create new Node
+    struct Node *temp = newNode(P, x);
+
+    // Special Case: The head of list has lesser
+    // priority than new node. So insert new
+    // node before head node and change head node.
+    if ((*head)->priority > x)
+    {
+
+        // Insert New Node before head
+        temp->next = *head;
+        (*head) = temp;
+    }
+    else
+    {
+
+        // Traverse the list and find a
+        // position to insert new node
+        while (start->next != NULL &&
+               start->next->priority < x)
+        {
+            start = start->next;
+        }
+
+        // Either at the ends of the list
+        // or at required position
+        temp->next = start->next;
+        start->next = temp;
+    }
+}
+
+// Function to check is list is empty
+int isEmpty(struct Node **head)
+{
+    return (*head) == NULL;
+}
+// ======================================
+// ======================================
+// ======================================
 
 ///==============================
-//don't mess with this variable//
-int * shmaddr;                 //
+// don't mess with this variable//
+int *shmaddr; //
 //===============================
-
-
 
 int getClk()
 {
     return *shmaddr;
 }
 
-
 /*
  * All process call this function at the beginning to establish communication between them and the clock module.
  * Again, remember that the clock is only emulation!
-*/
+ */
 void initClk()
 {
     int shmid = shmget(SHKEY, 4, 0444);
@@ -208,9 +214,8 @@ void initClk()
         sleep(1);
         shmid = shmget(SHKEY, 4, 0444);
     }
-    shmaddr = (int *) shmat(shmid, (void *)0, 0);
+    shmaddr = (int *)shmat(shmid, (void *)0, 0);
 }
-
 
 /*
  * All process call this function at the end to release the communication
@@ -218,7 +223,7 @@ void initClk()
  * Again, Remember that the clock is only emulation!
  * Input: terminateAll: a flag to indicate whether that this is the end of simulation.
  *                      It terminates the whole system and releases resources.
-*/
+ */
 
 void destroyClk(bool terminateAll)
 {

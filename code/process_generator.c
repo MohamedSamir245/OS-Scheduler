@@ -2,6 +2,59 @@
 
 void clearResources(int);
 
+int shmid;
+
+void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime)
+{
+    struct Process *shmaddr = (struct Process *)shmat(shmid, (void *)0, 0);
+    if (shmaddr == -1)
+    {
+        perror("Error in attach in writer");
+        exit(-1);
+    }
+
+    struct Process *tmpProcess;
+
+    tmpProcess = Process__create(id, arrTime, exTime, P);
+
+    // tmpProcess.arrivalTime = arrTime;
+    // tmpProcess.id = id;
+
+    Process__setFinishT(tmpProcess, finishTime);
+
+    Process__setRemainingT(tmpProcess, remainingTime);
+    // tmpProcess.finishTime = finishTime;
+    // tmpProcess.executionTime = exTime;
+    // tmpProcess.priority = P;
+    // tmpProcess.remainingTime = remainingTime;
+
+    *shmaddr = *tmpProcess;
+
+    // char snum[5];
+    // itoa(id, snum, 10);
+    // strcpy((char *)shmaddr, snum);
+    // strcpy((char *)shmaddr, (char)arrTime);
+    // strcpy((char *)shmaddr, (char)exTime);
+    // strcpy((char *)shmaddr, (char)P);
+    // strcpy((char *)shmaddr, (char)finishTime);
+    // strcpy((char *)shmaddr, (char)remainingTime);
+
+    // else
+    // {
+    //     printf("\nWriter: Shared memory attached at address %x\n", shmaddr);
+    //     strcpy((char *)shmaddr, "Initial string!");
+    // }
+    // while (1)
+    // {
+    //     // if (!strcmp((char *)shmaddr, "quit"))
+    //     // {
+    //         // break;
+    //     // }
+    // }
+    // printf("\nWriter Detaching...");
+    // shmdt(shmaddr);
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -65,6 +118,27 @@ int main(int argc, char *argv[])
         }
     }
 
+    //
+
+    shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
+    int schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
+
+    if ((long)shmid == -1)
+    {
+        perror("Error in creating shm!");
+        exit(-1);
+    }
+
+    int *shmaddr = (int *)shmat(shmid, (void *)0, 0);
+
+    if ((long)shmaddr == -1)
+    {
+        perror("Error in attaching the shm in clock!");
+        exit(-1);
+    }
+
+    ///
+
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
@@ -72,6 +146,8 @@ int main(int argc, char *argv[])
     // 3. Initiate and create the scheduler and clock processes.//////////////check this
     // 4. Use this function after creating the clock process to initialize clock
     system("'./clkScript.sh' &");
+    // system("'./schedulerScript.sh' &");
+
     initClk();
     // To get time use this
     int x = getClk();
@@ -82,11 +158,26 @@ int main(int argc, char *argv[])
     // 7. Clear clock resources
     // destroyClk(true);
 
+    //
+    printf("Ismail Enters writer");
+    printf("%d\n\n\n", schedulerShmId);
+
+    writer(schedulerShmId, 5, 100, 2, 3, 4, 8000);
+    // shmctl(schedulerShmId, IPC_RMID, (struct shmid_ds *)0);
+    // shmctl(shmid, IPC_RMID, (struct shmid_ds *)0);
+
+    sleep(1);
+    // writer(schedulerShmId, 50, 10, 20, 30, 40, 800);
+
+    printf("Ismail Enters writer");
+
+    //
     int pIdx = 0;
     printf("%d", processes[pIdx]->arrivalTime);
     while (true)
     {
         int x = getClk();
+
         sleep(1);
 
         printf("current time is %d\n", x);
@@ -95,6 +186,8 @@ int main(int argc, char *argv[])
         {
             printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
             // here we send it to the scheduler
+            writer(schedulerShmId, processes[pIdx]->id, processes[pIdx]->arrivalTime, processes[pIdx]->executionTime, processes[pIdx]->priority, processes[pIdx]->executionTime, processes[pIdx]->remainingTime);
+
             pIdx++;
         }
     }

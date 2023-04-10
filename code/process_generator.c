@@ -1,8 +1,10 @@
 #include "headers.h"
+#include "signal.h"
 
 void clearResources(int);
 
 int shmid;
+int schedulerShmId;
 
 void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime)
 {
@@ -54,9 +56,25 @@ void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, i
     // printf("\nWriter Detaching...");
     // shmdt(shmaddr);
 }
+void INTHandler(int signum)
+{
+
+    shmctl(schedulerShmId, IPC_RMID, (struct shmid_ds *)0);
+    shmctl(shmid, IPC_RMID, (struct shmid_ds *)0);
+
+    printf("IAM HERE LKJDFlk;jsaflkj dslk;");
+
+    // signal(SIGINT, INTHandler);
+
+    raise(SIGINT);
+
+    exit(0);
+}
 
 int main(int argc, char *argv[])
 {
+
+    // signal(SIGINT, INTHandler);
 
     struct Process *processes[10];
 
@@ -121,7 +139,7 @@ int main(int argc, char *argv[])
     //
 
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
-    int schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
+    schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
 
     if ((long)shmid == -1)
     {

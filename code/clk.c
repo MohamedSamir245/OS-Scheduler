@@ -6,6 +6,7 @@
  */
 
 #include "headers.h"
+#include "process_generator.c"
 
 int shmid;
 
@@ -14,6 +15,9 @@ void cleanup(int signum)
 {
     shmctl(shmid, IPC_RMID, NULL);
     printf("Clock terminating!\n");
+    printf("IAM HERE L");
+    INTHandler(signum);
+
     exit(0);
 }
 

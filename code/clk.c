@@ -14,6 +14,7 @@ void cleanup(int signum)
 {
     shmctl(shmid, IPC_RMID, NULL);
     printf("Clock terminating!\n");
+    signal(SIGINT, cleanup);
     exit(0);
 }
 

@@ -3,6 +3,7 @@
 void clearResources(int);
 
 int shmid;
+int schedulerShmId ;
 
 void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime)
 {
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     //
 
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
-    int schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
+    schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
 
     if ((long)shmid == -1)
     {
@@ -195,5 +196,8 @@ int main(int argc, char *argv[])
 
 void clearResources(int signum)
 {
+    shmctl(schedulerShmId, IPC_RMID, NULL);
+    signal(SIGINT, clearResources);
+    exit(0);
     // TODO Clears all resources in case of interruption
 }

@@ -6,7 +6,7 @@
  */
 
 #include "headers.h"
-#include "process_generator.c"
+// #include "process_generator.c" // TODO: fix error redefinition of functions
 
 int shmid;
 
@@ -16,7 +16,7 @@ void cleanup(int signum)
     shmctl(shmid, IPC_RMID, NULL);
     printf("Clock terminating!\n");
     printf("IAM HERE L");
-    INTHandler(signum);
+    // INTHandler(signum); // TODO: uncomment when you fix library include (#include "process_generator.c")
 
     exit(0);
 }

@@ -64,32 +64,36 @@ struct Process *reader(int shmid)
 }
 
 // addProcess: add *Process to Queue with respect to the Algorithim
-void addProcess(struct Node *head, struct Process *pNew)
+
+void addProcess(struct Process *pNew)
 {
     // printf("Delete: I am inside addProcess\n");
     if (algo == 1)
     {
-        if (!head)
+        if (!qHead)
         {
-            head = newNode(pNew, pNew->priority);
+            qHead = newNode(pNew, pNew->priority);
         }
-        push(&head, pNew, pNew->priority);
+        else
+        push(&qHead, pNew, pNew->priority);
     }
     else if (algo == 2)
     {
-        push(&head, pNew, pNew->remainingTime);
-        if (!head)
+        if (!qHead)
         {
-            head = newNode(pNew, pNew->remainingTime);
+            qHead = newNode(pNew, pNew->remainingTime);
         }
+        else
+        push(&qHead, pNew, pNew->remainingTime);
     }
     else
     {
-        push(&head, pNew, 0);
-        if (!head)
+        if (!qHead)
         {
-            head = newNode(pNew, 0);
+            qHead = newNode(pNew, 0);
         }
+        else
+        push(&qHead, pNew, 0);
     }
     // printf("Delete: I am going outside addProcess\n");
 }

@@ -17,6 +17,12 @@ typedef short bool;
 
 #define SHKEY 300
 
+struct msgbuff
+{
+    long mtype;
+    int request;
+};
+
 // ============================
 //
 

@@ -75,7 +75,7 @@ void addProcess(struct Process *pNew)
             qHead = newNode(pNew, pNew->priority);
         }
         else
-        push(&qHead, pNew, pNew->priority);
+            push(&qHead, pNew, pNew->priority);
     }
     else if (algo == 2)
     {
@@ -84,7 +84,7 @@ void addProcess(struct Process *pNew)
             qHead = newNode(pNew, pNew->remainingTime);
         }
         else
-        push(&qHead, pNew, pNew->remainingTime);
+            push(&qHead, pNew, pNew->remainingTime);
     }
     else
     {
@@ -93,7 +93,7 @@ void addProcess(struct Process *pNew)
             qHead = newNode(pNew, 0);
         }
         else
-        push(&qHead, pNew, 0);
+            push(&qHead, pNew, 0);
     }
     // printf("Delete: I am going outside addProcess\n");
 }
@@ -196,37 +196,83 @@ int main(int argc, char *argv[])
     // TODO implement the scheduler :)
     // upon termination release the clock resources.
 
-    int schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
+    int schedulerShmId = shmget(250, 128, IPC_CREAT | 0644);
+    int mesq_id = msgget(250, 0666 | IPC_CREAT);
+
     if ((long)schedulerShmId == -1)
     {
         perror("Error in creating shm!");
         exit(-1);
     }
+    if (mesq_id == -1)
+    {
+        perror("Error in creating MesQ!");
+        exit(-1);
+    }
+
+    printf("\nScheduler Shared memory ID = %d\n", schedulerShmId);
+    printf("Mesq_ID = %d\n", mesq_id);
+    // printf("Shared memory ID = %d\n", shmid);
+
     struct Process *shmaddr = (struct Process *)shmat(schedulerShmId, (void *)0, 0);
+    struct msgbuff message;
 
     // for (int i = 0; i < 5; i++)
     // {
     struct Process *ttt;
     int prevclk = getClk();
+    // printf("\nIam here\n");
+
+    struct msqid_ds __buf;
+
+    msgctl(mesq_id, IPC_STAT, &__buf);
+    int prevqnum = __buf.msg_qnum;
+    int rec_val;
     while (1)
     {
         if (prevclk != getClk())
         {
-            printf("Ismail Enters read\n");
-            ttt = reader(schedulerShmId); // TODO: need modification to read all added processes
-                                          // it reads only one
+            //
+            msgctl(mesq_id, IPC_STAT, &__buf);
 
-            printf("Ismail exit read");
-            if (ttt->executionTime != 0)
+            // printf("\nBefore\n%d\n", __buf.msg_qnum);
+
+            int currqnum = __buf.msg_qnum;
+            while (currqnum != prevqnum)
             {
-                // do something
-                addProcess(ttt);
-                // use data;
+                rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+                // __buf.msg_qnum--;
+                // msgctl(mesq_id, IPC_SET, &__buf);
+                // msgctl(mesq_id, IPC_RMID, NULL);
+
+                // printf("\nAfter\n%d\n", __buf.msg_qnum);
+
+                if (message.request == 1)
+                {
+
+                    printf("Ismail Enters read\n");
+                    ttt = reader(schedulerShmId); // TODO: need modification to read all added processes
+                                                  // it reads only one
+                    // int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+
+                    printf("Ismail exit read\n");
+                }
+
+                prevqnum = currqnum;
             }
-            printf("Prevclk = %d | current clk = %d\n", prevclk, getClk());
-            currentclk = getClk();
-            Central_Processing_Unit();
-            prevclk = getClk();
+
+            // if (ttt->executionTime != 0)
+            // {
+            //     // do something
+            //     addProcess(ttt);
+            //     // use data;
+            // }
+            // printf("Prevclk = %d | current clk = %d\n", prevclk, getClk());
+            // currentclk = getClk();
+            // Central_Processing_Unit();
+            // prevclk = getClk();
+
+            // sleep(2);
         }
     }
     //    Central_Processing_Unit();

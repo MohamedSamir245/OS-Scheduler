@@ -55,7 +55,7 @@ void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, i
     // printf("\nWriter Detaching...");
     // shmdt(shmaddr);
 }
-
+int mesq_id;
 int main(int argc, char *argv[])
 {
 
@@ -122,11 +122,19 @@ int main(int argc, char *argv[])
     //
 
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
-    schedulerShmId = shmget(250, 4, IPC_CREAT | 0644);
+    schedulerShmId = shmget(250, 128, IPC_CREAT | 0644);
+
+    mesq_id = msgget(250, 0666 | IPC_CREAT);
 
     if ((long)shmid == -1)
     {
         perror("Error in creating shm!");
+        exit(-1);
+    }
+
+    if (mesq_id == -1)
+    {
+        perror("Error in creating MesQ!");
         exit(-1);
     }
 
@@ -139,6 +147,8 @@ int main(int argc, char *argv[])
     }
 
     ///
+
+    struct msgbuff message;
 
     signal(SIGINT, clearResources);
     // TODO Initialization
@@ -159,37 +169,104 @@ int main(int argc, char *argv[])
     // 7. Clear clock resources
     // destroyClk(true);
 
-    //
-    printf("Ismail Enters writer");
-    printf("%d\n\n\n", schedulerShmId);
+    printf("\nIam here\n");
+    printf("\nScheduler Shared memory ID = %d\n", schedulerShmId);
+    printf("Mesq_ID = %d\n", mesq_id);
+    printf("Shared memory ID = %d\n", shmid);
+    // printf("Ismail Enters writer\n");
 
-    writer(schedulerShmId, 5, 100, 2, 3, 4, 8000);
-    // shmctl(schedulerShmId, IPC_RMID, (struct shmid_ds *)0);
-    // shmctl(shmid, IPC_RMID, (struct shmid_ds *)0);
+    // writer(schedulerShmId, 7, 100, 2, 3, 4, 8000);
 
-    sleep(1);
+    // message.mtype = 1;
+    // message.request = 1;
+
+    // int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+    // if (send_val == -1)
+    //     perror("Errror in send");
+    // // shmctl(schedulerShmId, IPC_RMID, (struct shmid_ds *)0);
+    // // shmctl(shmid, IPC_RMID, (struct shmid_ds *)0);
+
+    // int rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+
+    // sleep(2);
+    // printf("FINISH\n");
+
+    // writer(schedulerShmId, 5, 10, 20, 30, 40, 80);
+
+    // message.mtype = 1;
+    // message.request = 1;
+
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+
+    // if (send_val == -1)
+    //     perror("Errror in send");
     // writer(schedulerShmId, 50, 10, 20, 30, 40, 800);
 
-    printf("Ismail Enters writer");
+    // printf("Ismail Enters writer\n");
 
     //
     int pIdx = 0;
-    printf("%d", processes[pIdx]->arrivalTime);
+    // printf("%d", processes[pIdx]->arrivalTime);
+
+    int prevclk = getClk();
+
     while (true)
     {
         int x = getClk();
 
-        sleep(1);
-
-        printf("current time is %d\n", x);
-
-        while (pIdx < 10 && processes[pIdx]->arrivalTime == x)
+        if (x != prevclk)
         {
-            printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
-            // here we send it to the scheduler
-            writer(schedulerShmId, processes[pIdx]->id, processes[pIdx]->arrivalTime, processes[pIdx]->executionTime, processes[pIdx]->priority, processes[pIdx]->executionTime, processes[pIdx]->remainingTime);
 
-            pIdx++;
+            sleep(1);
+
+            printf("current time is %d\n", x);
+
+            while (pIdx < 10 && processes[pIdx]->arrivalTime == x) // fix this
+            {
+                printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
+                // here we send it to the scheduler
+                writer(schedulerShmId, processes[pIdx]->id, processes[pIdx]->arrivalTime, processes[pIdx]->executionTime, processes[pIdx]->priority, processes[pIdx]->executionTime, processes[pIdx]->remainingTime);
+
+                message.mtype = 1;
+                message.request = 1;
+
+                int send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+                if (send_val == -1)
+                    perror("Errror in send");
+
+                // int rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+
+                pIdx++;
+            }
+            prevclk = x;
         }
     }
 }
@@ -197,6 +274,8 @@ int main(int argc, char *argv[])
 void clearResources(int signum)
 {
     shmctl(schedulerShmId, IPC_RMID, NULL);
+    // shmctl(mesq_id, IPC_RMID, NULL);
+
     signal(SIGINT, clearResources);
     exit(0);
     // TODO Clears all resources in case of interruption

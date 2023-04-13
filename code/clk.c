@@ -15,9 +15,7 @@ void cleanup(int signum)
 {
     shmctl(shmid, IPC_RMID, NULL);
     printf("Clock terminating!\n");
-    printf("IAM HERE L");
-    // INTHandler(signum); // TODO: uncomment when you fix library include (#include "process_generator.c")
-
+    signal(SIGINT, cleanup);
     exit(0);
 }
 
@@ -40,10 +38,11 @@ int main(int argc, char *argv[])
         perror("Error in attaching the shm in clock!");
         exit(-1);
     }
-    *shmaddr = clk; /* initialize shared memory */
-    // int x;
-    // initClk();
-    while (1)
+    shmaddr = clk;
+    / initialize shared memory * /
+        // int x;
+        // initClk();
+        while (1)
     {
         sleep(1);
         (*shmaddr)++;

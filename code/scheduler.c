@@ -116,17 +116,19 @@ void Central_Processing_Unit()
 // HPF Algorithim
 void switch_HPF()
 {
-    if (!running_process_ossama)
+    if (!running_process_ossama && qHead)
     {
         printf("Delete: HPF - in peek\n");
-        running_process_ossama = peek(qHead);
+        // printf("Delete: qhead = %x\n",qHead);
+        // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
+        running_process_ossama = peek(&qHead);
         printf("Delete: HPF - out peek\n");
         printf("Delete: HPF - in pop\n");
         printf("Running process address is %x\n  ", running_process_ossama);
         printf("remaining time = %d\n", running_process_ossama->remainingTime);
         if (running_process_ossama)
         {
-            pop(qHead);
+            pop(&qHead);
         }
         printf("Delete: HPF - out pop\n");
     }
@@ -135,17 +137,25 @@ void switch_HPF()
 // SRTN Algorithim
 void switch_SRTN()
 {
-    if (!running_process_ossama && peek(qHead))
+    if (!running_process_ossama && peek(&qHead))
     {
-        running_process_ossama = peek(qHead);
-        pop(qHead);
+        printf("Delete: SRTN - in peek\n");
+        // printf("Delete: qhead = %x\n",qHead);
+        // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
+        running_process_ossama = peek(&qHead);
+        printf("Delete: SRTN - out peek\n");
+        printf("Delete: SRTN - in pop\n");
+        pop(&qHead);
+        printf("Delete: SRTN - out pop\n");
+                printf("Running process address is %x\n  ", running_process_ossama);
+        printf("remaining time = %d\n", running_process_ossama->remainingTime);
     }
-    else if (running_process_ossama && peek(qHead))
+    else if (running_process_ossama && peek(&qHead))
     {
-        if (peek(qHead)->remainingTime < running_process_ossama->remainingTime)
+        if (peek(&qHead)->remainingTime < running_process_ossama->remainingTime)
         {
             addProcess(running_process_ossama);
-            running_process_ossama = peek(qHead);
+            running_process_ossama = peek(&qHead);
             pop(qHead);
         }
     }
@@ -157,19 +167,19 @@ int RR_clock = 0;
 // RR Algorithim
 void switch_RR()
 {
-    if (!running_process_ossama->remainingTime)
+    if (!running_process_ossama->remainingTime && qHead)
     {
-        running_process_ossama = peek(qHead);
-        pop(qHead);
+        running_process_ossama = peek(&qHead);
+        pop(&qHead);
         RR_clock = currentclk;
     }
     else if (currentclk - RR_clock == quanta)
     {
         addProcess(running_process_ossama);
-        running_process_ossama = peek(qHead);
+        running_process_ossama = peek(&qHead);
         if (running_process_ossama)
         {
-            pop(qHead);
+            pop(&qHead);
             RR_clock = currentclk;
         }
     }
@@ -261,16 +271,18 @@ int main(int argc, char *argv[])
                 prevqnum = currqnum;
             }
 
-            // if (ttt->executionTime != 0)
-            // {
-            //     // do something
-            //     addProcess(ttt);
-            //     // use data;
-            // }
-            // printf("Prevclk = %d | current clk = %d\n", prevclk, getClk());
-            // currentclk = getClk();
-            // Central_Processing_Unit();
-            // prevclk = getClk();
+            if (ttt && ttt->executionTime != 0)
+            {
+                // printf("Delete: i am in if\n");
+                // do something
+                addProcess(ttt);
+                // use data;
+                // printf("Delete: i am going out if\n");
+            }
+            printf("Prevclk = %d | current clk = %d\n", prevclk, getClk());
+            currentclk = getClk();
+            Central_Processing_Unit();
+            prevclk = getClk();
 
             // sleep(2);
         }

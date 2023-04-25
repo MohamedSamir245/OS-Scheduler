@@ -10,53 +10,23 @@ int schedulerShmId;
 int mesq_id;
 
 // Run Scheduler process.
-// return 0 on success | -1 on failure
-int runScheduler(int algNumber, int processesNumber, int quanta)
+void int runScheduler(int algNumber, int processesNumber, int quanta)
 {
-    int sId = fork();
-
-    if (sId == -1) // Forking error
+    // run scheduler process & send data as arguments
+    if (algNumber == 3) // Round Robin = 3
     {
-        printf("Error in scheduler forking");
-        return -1;
+        system("./scheduler.out %d %d %d", processesNumber, algNumber, quanta);
     }
-    else if (sId == 0) // Child
+    else // HPF = 1 | SRTN = 2
     {
-        // Generate scheduler.out file
-        // system("gcc scheduler.c -o scheduler.out");
-
-        // run scheduler.out file & send data as arguments
-        if (algNumber == 3) // Round Robin = 3
-        {
-            execl("scheduler.out", "scheduler", processesNumber, algNumber, quanta, NULL);
-        }
-        else // HPF = 1 | SRTN = 2
-        {
-            execl("scheduler.out", "scheduler", processesNumber, algNumber, NULL);
-        }
+        system("./scheduler.out %d %d", processesNumber, algNumber);
     }
-    return 0;
 }
 
 // Run Clk process.
-// return 0 on success | -1 on failure
-int runClk()
+void runClk()
 {
-    int cId = fork();
-
-    if (cId == -1) // Forking error
-    {
-        printf("Error in clk forking");
-        return -1;
-    }
-    else if (cId == 0) // Child
-    {
-        // Generate clk.out file
-        // system("gcc clk.c -o clk.out");
-        // Run clk.out file
-        execl("./clk.out", "clk", NULL);
-    }
-    return 0;
+    system("./clk.out &");
 }
 
 // Write Process data in a sharedMemory for the scheduler

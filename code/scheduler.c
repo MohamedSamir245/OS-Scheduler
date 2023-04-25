@@ -12,10 +12,12 @@ struct Process *reader(int shmid);
 void addProcess(struct Process *);
 void printSchedulerPerf();
 void Central_Processing_Unit();
-void switch_algo_ossama();
+void switchAlgo();
 void switch_HPF();
 void switch_SRTN();
 void switch_RR();
+int runProcess(struct Process);
+void printSchedulerLog(int, int, char *, int, int, int, int);
 
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
@@ -23,7 +25,7 @@ void switch_RR();
 int algo = 1, currentclk; // TODO: receive algorithim value
 
 int utility_time = 0;
-int processes_num = 0;
+double processesNum = 0;
 int sum_times = 0;
 int sum_waiting = 0;
 
@@ -32,12 +34,14 @@ int kk = 0;
 
 struct Node *qHead = NULL;
 int id, arrTime, exTime, priority, finishTime, remainingTime;
-struct Process *running_process_ossama = NULL;
+struct Process *runningProcess = NULL;
 
 // For Round-Robin
 int clock = 0;
 int quanta = 0;
 int RR_clock = 0;
+
+FILE *schedulerLog;
 
 // ===============================================================================================
 // =====================================    Code   ===============================================
@@ -46,7 +50,7 @@ int RR_clock = 0;
 int main(int argc, char *argv[])
 {
     initClk();
-
+    openSchedulerLog();
     // TODO implement the scheduler :)
     // upon termination release the clock resources.
 
@@ -120,8 +124,8 @@ int main(int argc, char *argv[])
                 // printf("Delete: i am in if\n");
                 // do something
                 addProcess(ttt);
-                if (ttt->id > processes_num)
-                    processes_num = ttt->id;
+                if (ttt->id > processesNum)
+                    processesNum = ttt->id;
                 // use data;
                 // printf("Delete: i am going out if\n");
             }
@@ -142,7 +146,7 @@ int main(int argc, char *argv[])
     printf("After%d\n\n\n\n", schedulerShmId);
 
     // }
-
+    closeSchedulerLog();
     destroyClk(true);
 }
 
@@ -152,24 +156,47 @@ int main(int argc, char *argv[])
 
 void printSchedulerPerf()
 {
-    printf("CPU utilization = %d%%\n", 100.0 * utility_time / getClk());
-    double avg_wTA = 1.0 * sum_times / processes_num;
-    printf("Avg WTA = %d\n", avg_wTA);
-    printf("Avg Waiting = %d\n", 1.0 * sum_waiting / processes_num);
-    double square_sum = 0;
+    FILE *schedulerPerf;
+    schedulerPerf = fopen("schedular.perf", "w");
+
+    fprintf(schedulerPerf, "CPU utilization = %d%%\n", 100.0 * utility_time / getClk());
+    // printf("CPU utilization = %d%%\n", 100.0 * utility_time / getClk());
+
+    double avg_wTA = 1.0 * sum_times / processesNum;
+    fprintf(schedulerPerf, "Avg WTA = %d\n", avg_wTA);
+    // printf("Avg WTA = %d\n", avg_wTA);
+
+    fprintf(schedulerPerf, "Avg Waiting = %d\n", 1.0 * sum_waiting / processesNum);
+    // printf("Avg Waiting = %d\n", 1.0 * sum_waiting / processes_num);
+
+    double squareSum = 0;
     for (int i = 0; i < kk; i++)
     {
-        square_sum += (TA_arr[i] - avg_wTA) * (TA_arr[i] - avg_wTA);
+        squareSum += (TA_arr[i] - avg_wTA) * (TA_arr[i] - avg_wTA);
     }
-    double std = sqrt(square_sum / processes_num);
-    printf("Std WTA = %d\n", std);
+    // double std = sqrt(squareSum / processesNum); // TODO: Uncomment.
+    // fprintf(schedulerPerf, "Std WTA = %d\n", std); // TODO: Uncommnet.
+    // printf("Std WTA = %d\n", std);
+
+    fclose(schedulerPerf);
 }
 
 // #At time x process y state arr w total z remain y wait k
 void printSchedulerLog(int time, int pId, char *state, int arr, int total, int remain, int wait)
 {
-    printf("At time %d process %d %s arr %d total %d remain %d wait %d", time, pId, state, arr, total, remain, wait);
+    fprintf(schedulerLog, "At time %d process %d %s arr %d total %d remain %d wait %d\n", time, pId, state, arr, total, remain, wait);
+    // printf("At time %d process %d %s arr %d total %d remain %d wait %d\n", time, pId, state, arr, total, remain, wait);
 }
+
+void openSchedulerLog()
+{
+    schedulerLog = fopen("schedular.log", "w");
+};
+
+void closeSchedulerLog()
+{
+    fclose(schedulerLog);
+};
 
 // reader: read processes from "Shared Memory"
 struct Process *reader(int shmid)
@@ -268,21 +295,21 @@ void Central_Processing_Unit()
 {
     printf("Hello from CPU\n");
     printf("Delete: I am going to switch_algo_ossama\n");
-    switch_algo_ossama();
+    switchAlgo();
     printf("Delete: I am now out switch_algo_ossama\n");
-    if (running_process_ossama)
+    if (runningProcess)
     {
-        running_process_ossama->remainingTime--;
-        if (!running_process_ossama->remainingTime)
+        runningProcess->remainingTime--;
+        if (!runningProcess->remainingTime)
         {
-            running_process_ossama->turnaroundTime = currentclk - running_process_ossama->arrivalTime;
-            running_process_ossama->weightedTATime = running_process_ossama->turnaroundTime / running_process_ossama->executionTime;
-            TA_arr[kk] = running_process_ossama->weightedTATime;
+            runningProcess->turnaroundTime = currentclk - runningProcess->arrivalTime;
+            runningProcess->weightedTATime = runningProcess->turnaroundTime / runningProcess->executionTime;
+            TA_arr[kk] = runningProcess->weightedTATime;
             kk++;
-            sum_times += running_process_ossama->weightedTATime;
-            running_process_ossama->waitingTime = running_process_ossama->startTime - running_process_ossama->arrivalTime;
-            sum_waiting += running_process_ossama->waitingTime;
-            running_process_ossama = NULL;
+            sum_times += runningProcess->weightedTATime;
+            runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
+            sum_waiting += runningProcess->waitingTime;
+            runningProcess = NULL;
         }
     }
 }
@@ -290,22 +317,22 @@ void Central_Processing_Unit()
 // HPF Algorithim
 void switch_HPF()
 {
-    if (!running_process_ossama && qHead)
+    if (!runningProcess && qHead)
     {
         printf("Delete: HPF - in peek\n");
         // printf("Delete: qhead = %x\n",qHead);
         // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
-        running_process_ossama = peek(&qHead);
+        runningProcess = peek(&qHead);
         printf("Delete: HPF - out peek\n");
         printf("Delete: HPF - in pop\n");
-        printf("Running process address is %x\n  ", running_process_ossama);
-        printf("remaining time = %d\n", running_process_ossama->remainingTime);
-        if (running_process_ossama)
+        printf("Running process address is %x\n  ", runningProcess);
+        printf("remaining time = %d\n", runningProcess->remainingTime);
+        if (runningProcess)
         {
             pop(&qHead);
-            if (running_process_ossama->startTime == -1)
+            if (runningProcess->startTime == -1)
             {
-                running_process_ossama->startTime = currentclk;
+                runningProcess->startTime = currentclk;
             }
         }
         printf("Delete: HPF - out pop\n");
@@ -315,33 +342,33 @@ void switch_HPF()
 // SRTN Algorithim
 void switch_SRTN()
 {
-    if (!running_process_ossama && peek(&qHead))
+    if (!runningProcess && peek(&qHead))
     {
         printf("Delete: SRTN - in peek\n");
         // printf("Delete: qhead = %x\n",qHead);
         // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
-        running_process_ossama = peek(&qHead);
+        runningProcess = peek(&qHead);
         printf("Delete: SRTN - out peek\n");
         printf("Delete: SRTN - in pop\n");
         pop(&qHead);
-        if (running_process_ossama->startTime == -1)
+        if (runningProcess->startTime == -1)
         {
-            running_process_ossama->startTime = currentclk;
+            runningProcess->startTime = currentclk;
         }
         printf("Delete: SRTN - out pop\n");
-        printf("Running process address is %x\n  ", running_process_ossama);
-        printf("remaining time = %d\n", running_process_ossama->remainingTime);
+        printf("Running process address is %x\n  ", runningProcess);
+        printf("remaining time = %d\n", runningProcess->remainingTime);
     }
-    else if (running_process_ossama && peek(&qHead))
+    else if (runningProcess && peek(&qHead))
     {
-        if (peek(&qHead)->remainingTime < running_process_ossama->remainingTime)
+        if (peek(&qHead)->remainingTime < runningProcess->remainingTime)
         {
-            addProcess(running_process_ossama);
-            running_process_ossama = peek(&qHead);
+            addProcess(runningProcess);
+            runningProcess = peek(&qHead);
             pop(&qHead);
-            if (running_process_ossama->startTime == -1)
+            if (runningProcess->startTime == -1)
             {
-                running_process_ossama->startTime = currentclk;
+                runningProcess->startTime = currentclk;
             }
         }
     }
@@ -350,33 +377,33 @@ void switch_SRTN()
 // RR Algorithim
 void switch_RR()
 {
-    if (!running_process_ossama->remainingTime && qHead)
+    if (!runningProcess->remainingTime && qHead)
     {
-        running_process_ossama = peek(&qHead);
+        runningProcess = peek(&qHead);
         pop(&qHead);
-        if (running_process_ossama->startTime == -1)
+        if (runningProcess->startTime == -1)
         {
-            running_process_ossama->startTime = currentclk;
+            runningProcess->startTime = currentclk;
         }
         RR_clock = currentclk;
     }
     else if (currentclk - RR_clock == quanta)
     {
-        addProcess(running_process_ossama);
-        running_process_ossama = peek(&qHead);
-        if (running_process_ossama)
+        addProcess(runningProcess);
+        runningProcess = peek(&qHead);
+        if (runningProcess)
         {
             pop(&qHead);
-            if (running_process_ossama->startTime == -1)
+            if (runningProcess->startTime == -1)
             {
-                running_process_ossama->startTime = currentclk;
+                runningProcess->startTime = currentclk;
             }
             RR_clock = currentclk;
         }
     }
 }
 
-void switch_algo_ossama()
+void switchAlgo()
 {
     if (algo == 1)
     {
@@ -386,6 +413,30 @@ void switch_algo_ossama()
     {
         switch_SRTN();
     }
-    else
+    else // 3
         switch_RR();
+}
+
+// Run Process process.
+// return 0 on success | -1 on failure
+int runProcess(struct Process p)
+{
+    int p.pId = fork();
+
+    if (p.pId == -1) // Forking error
+    {
+        printf("Error in process forking");
+        return -1;
+    }
+    else if (p.pId == 0) // Child
+    {
+        // Generate process.out file
+        system("gcc process.c -o process.out");
+        // Run process.out file
+        execl("./process.out", "process", NULL);
+    }
+
+    // Print line in scheduler.log
+    // printSchedulerLog(...); // TODO: what is the parameters.
+    return 0;
 }

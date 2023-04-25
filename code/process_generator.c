@@ -1,10 +1,65 @@
 #include "headers.h"
 
 void clearResources(int);
+int runScheduler(int, int, int);
+int runClk();
+void writer(int, int, int, int, int, int, int);
 
 int shmid;
 int schedulerShmId;
+int mesq_id;
 
+// Run Scheduler process.
+// return 0 on success | -1 on failure
+int runScheduler(int algNumber, int processesNumber, int quanta)
+{
+    int sId = fork();
+
+    if (sId == -1) // Forking error
+    {
+        printf("Error in scheduler forking");
+        return -1;
+    }
+    else if (sId == 0) // Child
+    {
+        // Generate scheduler.out file
+        // system("gcc scheduler.c -o scheduler.out");
+
+        // run scheduler.out file & send data as arguments
+        if (algNumber == 3) // Round Robin = 3
+        {
+            execl("scheduler.out", "scheduler", processesNumber, algNumber, quanta, NULL);
+        }
+        else // HPF = 1 | SRTN = 2
+        {
+            execl("scheduler.out", "scheduler", processesNumber, algNumber, NULL);
+        }
+    }
+    return 0;
+}
+
+// Run Clk process.
+// return 0 on success | -1 on failure
+int runClk()
+{
+    int cId = fork();
+
+    if (cId == -1) // Forking error
+    {
+        printf("Error in clk forking");
+        return -1;
+    }
+    else if (cId == 0) // Child
+    {
+        // Generate clk.out file
+        // system("gcc clk.c -o clk.out");
+        // Run clk.out file
+        execl("./clk.out", "clk", NULL);
+    }
+    return 0;
+}
+
+// Write Process data in a sharedMemory for the scheduler
 void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime)
 {
     struct Process *shmaddr = (struct Process *)shmat(shmid, (void *)0, 0);
@@ -55,7 +110,7 @@ void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, i
     // printf("\nWriter Detaching...");
     // shmdt(shmaddr);
 }
-int mesq_id;
+
 int main(int argc, char *argv[])
 {
 
@@ -153,28 +208,33 @@ int main(int argc, char *argv[])
     signal(SIGINT, clearResources);
     // TODO Initialization
     // 1. Read the input files.
+    // readFiles(); // TODO: Uncomment.
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
+    // readSchedulerArguments(); // TODO: Uncomment.
     // 3. Initiate and create the scheduler and clock processes.//////////////check this
+    runClk();
+    runScheduler(1, 50, 3); // TODO: read parameters then send them.
     // 4. Use this function after creating the clock process to initialize clock
-    system("'./clkScript.sh' &");
-    // system("'./schedulerScript.sh' &");
-
     initClk();
     // To get time use this
     int x = getClk();
+
+    // system("'./clkScript.sh' &");
+    // system("'./schedulerScript.sh' &");
     // printf("current time is %d\n", x);
     // TODO Generation Main Loop
+
     // 5. Create a data structure for processes and provide it with its parameters.
     // 6. Send the information to the scheduler at the appropriate time.
-    // 7. Clear clock resources
-    // destroyClk(true);
-
     printf("\nIam here\n");
     printf("\nScheduler Shared memory ID = %d\n", schedulerShmId);
     printf("Mesq_ID = %d\n", mesq_id);
     printf("Shared memory ID = %d\n", shmid);
-    // printf("Ismail Enters writer\n");
 
+    // 7. Clear clock resources
+    // destroyClk(true); // TODO: Uncomment.
+
+    // printf("Ismail Enters writer\n");
     // writer(schedulerShmId, 7, 100, 2, 3, 4, 8000);
 
     // message.mtype = 1;

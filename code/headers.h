@@ -43,6 +43,7 @@ struct Process
     int weightedTATime;
     int startTime;
     int waitingTime;
+    int pId;
 };
 
 void Process__init(struct Process *self, int id, int ar, int run, int p)
@@ -57,6 +58,7 @@ void Process__init(struct Process *self, int id, int ar, int run, int p)
     self->weightedTATime = 0;
     self->startTime = -1;
     self->waitingTime = 0;
+    self->pId = -1;
 }
 
 void changecurrentstate(struct Process *self, int s)

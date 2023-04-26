@@ -418,7 +418,7 @@ void switchAlgo()
 }
 
 // Run Process process.
-// return 0 on success | -1 on failure
+// return pId on success | -1 on failure
 int runProcess(struct Process p)
 {
     int p.pId = fork();
@@ -430,13 +430,19 @@ int runProcess(struct Process p)
     }
     else if (p.pId == 0) // Child
     {
-        // Generate process.out file
-        system("gcc process.c -o process.out");
         // Run process.out file
         execl("./process.out", "process", NULL);
     }
 
     // Print line in scheduler.log
     // printSchedulerLog(...); // TODO: what is the parameters.
-    return 0;
+    return p.pId;
 }
+
+void stopProcess()
+{
+    
+}
+
+void terminateProcess()
+{}

@@ -17,6 +17,15 @@ typedef short bool;
 
 #define SHKEY 300
 
+struct msgbuff
+{
+    long mtype;
+    int request;
+};
+
+// ============================
+//
+
 // ======================================
 // ===========  Process =================
 // ======================================
@@ -29,6 +38,12 @@ struct Process
     int arrivalTime;
     int finishTime;
     int remainingTime;
+    char* currentState;
+    int turnaroundTime;
+    int weightedTATime;
+    int startTime;
+    int waitingTime;
+    int pId;
 };
 
 void Process__init(struct Process *self, int id, int ar, int run, int p)
@@ -38,6 +53,17 @@ void Process__init(struct Process *self, int id, int ar, int run, int p)
     self->executionTime = run;
     self->id = id;
     self->remainingTime = run;
+    self->currentState = "na";
+    self->turnaroundTime = 0;
+    self->weightedTATime = 0;
+    self->startTime = -1;
+    self->waitingTime = 0;
+    self->pId = -1;
+}
+
+void changecurrentstate(struct Process *self, int s)
+{
+    self->currentState = s;
 }
 
 struct Process *Process__create(int id, int ar, int run, int p)

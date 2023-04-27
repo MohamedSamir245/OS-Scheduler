@@ -6,6 +6,7 @@
  */
 
 #include "headers.h"
+// #include "process_generator.c" // TODO: fix error redefinition of functions
 
 int shmid;
 
@@ -37,9 +38,12 @@ int main(int argc, char *argv[])
         perror("Error in attaching the shm in clock!");
         exit(-1);
     }
-    *shmaddr = clk; /* initialize shared memory */
+    *shmaddr = clk;
+    // initialize shared memory * /
     // int x;
     // initClk();
+
+    // printf("\nIam here\n");
     while (1)
     {
         sleep(1);

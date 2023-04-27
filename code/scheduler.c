@@ -23,7 +23,7 @@ void printQueue();
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
 // ===============================================================================================
-int algo = 2, currentclk; // TODO: receive algorithim value
+int algo = 1, currentclk; // TODO: receive algorithim value
 
 int utility_time = 0;
 double processesNum = 0;

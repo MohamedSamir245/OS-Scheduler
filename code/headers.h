@@ -17,6 +17,9 @@ typedef short bool;
 
 #define SHKEY 300
 
+//============== algo and quantum ======
+int algo;
+int quantum;
 struct msgbuff
 {
     long mtype;
@@ -258,4 +261,23 @@ void destroyClk(bool terminateAll)
     {
         killpg(getpgrp(), SIGINT);
     }
+}
+
+//=======================================================
+//==================== sendign algo and quantum =========
+//=======================================================
+void setAlgoAndQuantum(int al,int qu)
+{
+    algo=al;
+    quantum=qu;
+}
+
+int getAlgo()
+{
+    return algo;
+}
+
+int getQuantum()
+{
+    return quantum;
 }

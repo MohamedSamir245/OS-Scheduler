@@ -38,7 +38,7 @@ struct Process
     int arrivalTime;
     int finishTime;
     int remainingTime;
-    int currentState;
+    char* currentState;
     int turnaroundTime;
     int weightedTATime;
     int startTime;
@@ -53,7 +53,7 @@ void Process__init(struct Process *self, int id, int ar, int run, int p)
     self->executionTime = run;
     self->id = id;
     self->remainingTime = run;
-    self->currentState = 0;
+    self->currentState = "na";
     self->turnaroundTime = 0;
     self->weightedTATime = 0;
     self->startTime = -1;

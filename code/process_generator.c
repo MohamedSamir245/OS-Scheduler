@@ -1,8 +1,8 @@
-#include "headers.h"
+ #include "headers.h"
 
 void clearResources(int);
-int runScheduler(int, int, int);
-int runClk();
+void runScheduler(int, int, int);
+void runClk();
 void writer(int, int, int, int, int, int, int);
 
 int shmid;
@@ -10,17 +10,19 @@ int schedulerShmId;
 int mesq_id;
 
 // Run Scheduler process.
-void int runScheduler(int algNumber, int processesNumber, int quanta)
+void runScheduler(int algNumber, int processesNumber, int quanta)
 {
+    system("./scheduler.out");
+    // TODO: Uncomment next lines.
     // run scheduler process & send data as arguments
-    if (algNumber == 3) // Round Robin = 3
-    {
-        system("./scheduler.out %d %d %d", processesNumber, algNumber, quanta);
-    }
-    else // HPF = 1 | SRTN = 2
-    {
-        system("./scheduler.out %d %d", processesNumber, algNumber);
-    }
+    // if (algNumber == 3) // Round Robin = 3
+    // {
+    //     system("./scheduler.out %d %d %d", processesNumber, algNumber, quanta);
+    // }
+    // else // HPF = 1 | SRTN = 2
+    // {
+    //     system("./scheduler.out %d %d", processesNumber, algNumber);
+    // }
 }
 
 // Run Clk process.
@@ -98,17 +100,17 @@ int main(int argc, char *argv[])
     int id, arTime, runTime, Prio;
     // fgets(con, 1000, fp);
 
-    int i = 0;
+    int k = 0;
     while (fscanf(fp, "%d %d %d %d", &id, &arTime, &runTime, &Prio) == 4)
     {
         printf("%d %d %d %d\n", id, arTime, runTime, Prio);
 
-        processes[i++] = Process__create(id, arTime, runTime, Prio);
+        processes[k++] = Process__create(id, arTime, runTime, Prio);
 
         // here create a process and add it to the array
     }
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < k; i++)
     {
         printf("PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", processes[i]->id, processes[i]->executionTime, processes[i]->arrivalTime, processes[i]->priority, processes[i]->remainingTime, processes[i]->finishTime);
     }
@@ -183,7 +185,7 @@ int main(int argc, char *argv[])
     // readSchedulerArguments(); // TODO: Uncomment.
     // 3. Initiate and create the scheduler and clock processes.//////////////check this
     runClk();
-    runScheduler(1, 50, 3); // TODO: read parameters then send them.
+    // runScheduler(1, 50, 3); // TODO: read parameters then send them.
     // 4. Use this function after creating the clock process to initialize clock
     initClk();
     // To get time use this

@@ -12,27 +12,38 @@ int main(int agrc, char *argv[])
 {
     initClk();
 
-    int shmid, pid;
+    int shmid;
     key_t key_id;
     key_id = ftok("keyfile", 65);
     shmid = shmget(key_id, 4096, IPC_CREAT | 0644);
+    if (shmid == -1)
+    {
+        perror("Error in create");
+        exit(-1);
+    }
+    else
+        printf("\nShared memory ID = %d\n", shmid);
 
-    void *shmaddr = shmat(shmid, (void *)0, 0);
+
+    int *shmaddr = (int*)shmat(shmid, (void *)0, 0);
     if (shmaddr == -1)
     {
         perror("Error in attach in reader");
         exit(-1);
     }
+    printf("\nReader: Shared memory attached at address %x\n", shmaddr);
 
     // TODO it needs to get the remaining time from somewhere
-    int *remainingtime = (int*)shmaddr;
-    while (*remainingtime > 0)
+    // int *remainingtime = (int*)shmaddr;
+    while (*shmaddr > 0)
     {
         if(prevclk!=getClk()){
-            *remainingtime--;
+            (*shmaddr)--;
+            prevclk=getClk();
         }
-        prevclk=getClk();
     }
+
+
     shmdt(shmaddr);
     destroyClk(false);
 

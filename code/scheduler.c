@@ -203,6 +203,8 @@ int main(int argc, char *argv[])
             // ====================
             currentclk = getClk();
             Central_Processing_Unit(); // TODO: Uncomment.
+            // After schedule process.. increase waiting time to other processes
+            increaseWaitTime();
             prevclk = getClk();
 
             // sleep(2);
@@ -230,6 +232,23 @@ int main(int argc, char *argv[])
 // ===============================================================================================
 // =====================================    Functions Implementation    ==========================
 // ===============================================================================================
+
+void increaseWaitTime()
+{
+    struct Node *temp = qHead;
+
+    if (temp)
+    {
+        printf("p(wait) : ");
+        while (temp && temp->data != NULL)
+        {
+            temp->data->waitingTime++;
+            printf("%d(%d) ", temp->data->id, temp->data->waitingTime);
+            temp = temp->next;
+        }
+        printf("\n");
+    }
+}
 
 void printQueue()
 {
@@ -400,7 +419,7 @@ void resumeProcess(struct Process *p)
 
     p->currentState = "resumed";
     kill(p->pId, SIGCONT);
-    printSchedulerLog(currentclk, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
 }
 
 void stopProcess(struct Process *p)
@@ -409,7 +428,7 @@ void stopProcess(struct Process *p)
 
     p->currentState = "stopped";
     kill(p->pId, SIGSTOP);
-    printSchedulerLog(currentclk, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
 }
 
 void finishProcess(struct Process *p)
@@ -417,7 +436,7 @@ void finishProcess(struct Process *p)
     printf("Hello from finishProcess\n");
 
     p->currentState = "finished";
-    printSchedulerLog2(currentclk, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime, runningProcess->turnaroundTime, runningProcess->weightedTATime);
+    printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
 
     // Process__destroy(p); // TODO: Uncomment.
 }
@@ -474,7 +493,7 @@ void switch_HPF()
     else if (runningProcess && !runningProcess->remainingTime)
     {
         calc_stat(runningProcess);
-        finishProcess(&runningProcess);
+        finishProcess(runningProcess);
         if (qHead && peek(qHead))
         {
             runningProcess = peek(&qHead);
@@ -544,7 +563,7 @@ void switch_SRTN()
         else if (!runningProcess->remainingTime)
         {
             calc_stat(runningProcess);
-            finishProcess(&runningProcess);
+            finishProcess(runningProcess);
             if (peek(qHead))
             {
                 runningProcess = peek(&qHead);
@@ -582,7 +601,7 @@ void switch_RR()
     else if (!runningProcess->remainingTime)
     {
         calc_stat(runningProcess);
-        finishProcess(&runningProcess);
+        finishProcess(runningProcess);
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
@@ -594,7 +613,7 @@ void switch_RR()
             }
             else
             {
-                resumeProcess(&runningProcess);
+                resumeProcess(runningProcess);
             }
             RR_clock = currentclk;
         }
@@ -615,7 +634,7 @@ void switch_RR()
             }
             else
             {
-                resumeProcess(&runningProcess);
+                resumeProcess(runningProcess);
             }
             RR_clock = currentclk;
         }
@@ -661,7 +680,7 @@ int runProcess(struct Process *p)
         execl("./process.out", "process", NULL);
     }
     p->currentState = "started";
-    printSchedulerLog(p->startTime, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
     // Print line in scheduler.log
     // printSchedulerLog(...); // TODO: what is the parameters.
     return p->pId;

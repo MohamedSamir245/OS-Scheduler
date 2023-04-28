@@ -263,9 +263,9 @@ void destroyClk(bool terminateAll)
     }
 }
 
-//=======================================================
-//==================== sendign algo and quantum =========
-//=======================================================
+//===================================================================
+//==================== sendign algo and quantum =====================
+//===================================================================
 void setAlgoAndQuantum(int al,int qu)
 {
     algo=al;
@@ -281,3 +281,29 @@ int getQuantum()
 {
     return quantum;
 }
+
+//=====================================================================
+//==================== Tree of buddy process management ===============
+//=====================================================================
+struct treeNode
+{
+    int id      // -1 for empty segment
+        ,start
+        ,size;
+    struct treeNode* right;
+    struct treeNode* left;
+    struct treeNode* parent;
+};
+
+struct treeNode* createTreeNode(int st,int siz,struct treeNode * p)
+{
+    struct treeNode *temp = (struct treeNode *)malloc(sizeof(struct treeNode));
+    temp->start=st;
+    temp->size=siz;
+    temp->parent=p;
+    temp->left=NULL;
+    temp->right=NULL;
+    return temp;
+}
+
+

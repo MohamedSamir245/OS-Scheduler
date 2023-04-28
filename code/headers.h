@@ -288,39 +288,37 @@ int getQuantum()
 struct treeNode
 {
     int id // -1 for empty segment
-        ,start
-        ,size
-        ,position;      // 0 => root  1 => right  -1 => left 
+        ,
+        start, size, position; // 0 => root  1 => right  -1 => left
     struct treeNode *right;
     struct treeNode *left;
     struct treeNode *parent;
 };
 
-struct treeNode* createTreeNode(int start, int size,int position, struct treeNode *parent)
+struct treeNode *createTreeNode(int start, int size, int position, struct treeNode *parent)
 {
     struct treeNode *tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
     tempNode->start = start;
     tempNode->size = size;
-    tempNode->position= position;
+    tempNode->position = position;
     tempNode->parent = parent;
     tempNode->left = NULL;
     tempNode->right = NULL;
     return tempNode;
 }
 
-struct treeNode* mergeAfterDeleting(struct treeNode* deleted)
+struct treeNode *mergeAfterDeleting(struct treeNode *deleted)
 {
-    struct treeNode* nodeParent;
-    while(deleted->parent && deleted->id == -1)
+    struct treeNode *nodeParent;
+    while (deleted->parent && deleted->id == -1)
     {
         nodeParent = deleted->parent;
-        if((deleted->position == 1 && nodeParent->left->id == -1)
-        ||
-          (deleted->position == -1 && nodeParent->right->id == -1))       // this is a right child
+        if ((deleted->position == 1 && nodeParent->left->id == -1) ||
+            (deleted->position == -1 && nodeParent->right->id == -1)) // this is a right child
         {
-                nodeParent->right=NULL;
-                nodeParent->left=NULL;
-                deleted = nodeParent;
+            nodeParent->right = NULL;
+            nodeParent->left = NULL;
+            deleted = nodeParent;
         }
     }
     return deleted;
@@ -338,9 +336,12 @@ int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
             bestIdx = i;
             break;
         }
-        else if (pSize < leaves[i]->size && leaves[i]->size < leaves[bestIdx]->size)
+        else if (pSize < leaves[i]->size)
         {
-            bestIdx = i;
+            if (bestIdx == -1)
+                bestIdx = i;
+            else if (leaves[i]->size < leaves[bestIdx]->size)
+                bestIdx = i;
         }
     }
 
@@ -352,10 +353,15 @@ int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
     }
     while (pSize <= leaves[bestIdx]->size / 2)
     {
-        struct treeNode *l = createTreeNode(leaves[bestIdx]->start, leaves[bestIdx]->size / 2, leaves[bestIdx]);
-        struct treeNode *r = createTreeNode(leaves[bestIdx]->start + leaves[bestIdx]->size, leaves[bestIdx]->size / 2, leaves[bestIdx]);
+        struct treeNode *l = createTreeNode(leaves[bestIdx]->start, leaves[bestIdx]->size / 2, -1, leaves[bestIdx]);
+        struct treeNode *r = createTreeNode(leaves[bestIdx]->start + leaves[bestIdx]->size / 2, 1, leaves[bestIdx]->size / 2, leaves[bestIdx]);
+        l->id = -1;
+        r->id = -1;
+        l->position = -1;
+        r->position = 1;
         leaves[bestIdx]->left = l;
         leaves[bestIdx]->right = r;
+
         // add them to leaves array;
         //  bestIdx=array.size()-2
         // Think about how we will implement the array (you can declare with max size which is 1024 and use variable to indicate the actual size)

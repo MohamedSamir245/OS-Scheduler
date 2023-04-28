@@ -41,7 +41,7 @@ struct Process
     int arrivalTime;
     int finishTime;
     int remainingTime;
-    char* currentState;
+    char *currentState;
     int turnaroundTime;
     int weightedTATime;
     int startTime;
@@ -266,10 +266,10 @@ void destroyClk(bool terminateAll)
 //===================================================================
 //==================== sendign algo and quantum =====================
 //===================================================================
-void setAlgoAndQuantum(int al,int qu)
+void setAlgoAndQuantum(int al, int qu)
 {
-    algo=al;
-    quantum=qu;
+    algo = al;
+    quantum = qu;
 }
 
 int getAlgo()
@@ -287,23 +287,50 @@ int getQuantum()
 //=====================================================================
 struct treeNode
 {
-    int id      // -1 for empty segment
-        ,start
-        ,size;
-    struct treeNode* right;
-    struct treeNode* left;
-    struct treeNode* parent;
+    int id // -1 for empty segment
+        ,
+        start, size;
+    struct treeNode *right;
+    struct treeNode *left;
+    struct treeNode *parent;
 };
 
-struct treeNode* createTreeNode(int st,int siz,struct treeNode * p)
+struct treeNode *createTreeNode(int st, int siz, struct treeNode *p)
 {
     struct treeNode *temp = (struct treeNode *)malloc(sizeof(struct treeNode));
-    temp->start=st;
-    temp->size=siz;
-    temp->parent=p;
-    temp->left=NULL;
-    temp->right=NULL;
+    temp->start = st;
+    temp->size = siz;
+    temp->parent = p;
+    temp->left = NULL;
+    temp->right = NULL;
     return temp;
 }
 
+int allocateMemory(struct treeNode *leaves[], int size, int pSize)
+{
+    // Get Best Fit
+    int bestIdx = -1;
 
+    for (int i = 0; i < size; i++)
+    {
+        if (pSize == leaves[i]->size)
+        {
+            bestIdx = i;
+            break;
+        }
+        else if (pSize < leaves[i]->size && leaves[i]->size < leaves[bestIdx]->size)
+        {
+            bestIdx = i;
+        }
+    }
+
+    if (bestIdx == -1)
+    {
+        // No Empty Space
+        // Think about what you will do
+        return -1;
+    }
+    if (pSize <= leaves[bestIdx] / 2)
+    {
+    }
+}

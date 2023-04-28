@@ -185,6 +185,9 @@ int main(int argc, char *argv[])
                 // do something
                 struct Process *pAdd;
                 pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority);
+                // runningProcess->startTime = currentclk; //////////
+                // printf("Current time from addProcess here for Process %d is %d", pNew->id, currentclk);
+
                 addProcess(pAdd);
                 prevAddedProcessId = ttt->id;
                 printQueue();
@@ -347,7 +350,7 @@ struct Process *reader(int shmid)
 
     // addProcess(tmpProcess);
 
-    printf("Ismail  PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", tmpProcess->id, tmpProcess->executionTime, tmpProcess->arrivalTime, tmpProcess->priority, tmpProcess->remainingTime, tmpProcess->finishTime);
+    // printf("Ismail  PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", tmpProcess->id, tmpProcess->executionTime, tmpProcess->arrivalTime, tmpProcess->priority, tmpProcess->remainingTime, tmpProcess->finishTime);
     // printf("Delete: I am going outside reader\n");
 
     return tmpProcess;
@@ -357,9 +360,10 @@ struct Process *reader(int shmid)
 
 void addProcess(struct Process *pNew)
 {
-    printf("Hello from addProcess. Adding process %d\n", pNew->id);
+    printf("Hello from addProcess Adding process %d\n", pNew->id);
 
     // printf("Delete: I am inside addProcess\n");
+    // printf("Current time from addProcess for Process %d is %d", pNew->id, currentclk);
     if (algo == 1)
     {
         if (!qHead)
@@ -435,7 +439,7 @@ void calc_stat(struct Process *p)
 // Scheduler fn.
 void Central_Processing_Unit()
 {
-    printf("Hello from CPU\n");
+    // printf("Hello from CPU\n");
     // printf("Delete: I am going to switch_algo_ossama\n");
     switchAlgo();
     // printf("Delete: I am now out switch_algo_ossama\n");
@@ -444,7 +448,7 @@ void Central_Processing_Unit()
 // HPF Algorithim
 void switch_HPF()
 {
-    printf("Hello from switch_HPF\n");
+    // printf("Hello from switch_HPF\n");
 
     if (!runningProcess && qHead)
     {
@@ -480,6 +484,7 @@ void switch_HPF()
             printf("remaining time = %d\n", runningProcess->remainingTime);
             if (runningProcess)
             {
+
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
@@ -494,7 +499,7 @@ void switch_HPF()
 // SRTN Algorithim
 void switch_SRTN()
 {
-    printf("Hello from switch_SRTN\n");
+    // printf("Hello from switch_SRTN\n");
 
     if (!runningProcess && qHead)
     {
@@ -522,6 +527,7 @@ void switch_SRTN()
         if (peek(qHead) && peek(&qHead)->remainingTime < runningProcess->remainingTime)
         {
             stopProcess(runningProcess);
+            runningProcess->startTime = currentclk; //////////
             addProcess(runningProcess);
             runningProcess = peek(&qHead);
             pop(&qHead);
@@ -560,7 +566,7 @@ void switch_SRTN()
 // RR Algorithim
 void switch_RR()
 {
-    printf("Hello from switch_RR\n");
+    // printf("Hello from switch_RR\n");
 
     if (!runningProcess && qHead)
     {
@@ -596,6 +602,7 @@ void switch_RR()
     else if (currentclk - RR_clock == quanta)
     {
         stopProcess(runningProcess);
+        runningProcess->startTime = currentclk; //////////
         addProcess(runningProcess);
         runningProcess = peek(&qHead);
         if (runningProcess)
@@ -617,7 +624,7 @@ void switch_RR()
 
 void switchAlgo()
 {
-    printf("Hello from switchAlgo\n");
+    // printf("Hello from switchAlgo\n");
     if (algo == 1)
     {
         switch_HPF();
@@ -639,6 +646,8 @@ int runProcess(struct Process *p)
     *processShmaddr = p->remainingTime;
     printf("*processShmaddr = %d\n", *processShmaddr);
 
+    // p->startTime = currentclk;
+
     p->pId = fork();
 
     if (p->pId == -1) // Forking error
@@ -652,7 +661,7 @@ int runProcess(struct Process *p)
         execl("./process.out", "process", NULL);
     }
     p->currentState = "started";
-    printSchedulerLog(currentclk, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime);
+    printSchedulerLog(p->startTime, runningProcess->id, runningProcess->currentState, runningProcess->arrivalTime, runningProcess->executionTime, runningProcess->remainingTime, runningProcess->waitingTime);
     // Print line in scheduler.log
     // printSchedulerLog(...); // TODO: what is the parameters.
     return p->pId;

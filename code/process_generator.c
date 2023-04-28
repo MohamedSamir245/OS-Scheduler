@@ -1,4 +1,4 @@
- #include "headers.h"
+#include "headers.h"
 
 void clearResources(int);
 void runScheduler(int, int, int);
@@ -17,7 +17,7 @@ void runScheduler(int algNumber, int processesNumber, int quanta)
     // run scheduler process & send data as arguments
     // if (algNumber == 3) // Round Robin = 3
     // {
-    //     char* command="./scheduler.out "+ processesNumber +" "+algNumber+" "+quanta; 
+    //     char* command="./scheduler.out "+ processesNumber +" "+algNumber+" "+quanta;
     //     system("./scheduler.out %d %d %d", processesNumber, algNumber, quanta);
     // }
     // else // HPF = 1 | SRTN = 2
@@ -147,8 +147,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    setAlgoAndQuantum(al,Quantum);
-    
+    setAlgoAndQuantum(al, Quantum);
+
     //
 
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
@@ -280,8 +280,6 @@ int main(int argc, char *argv[])
         if (x != prevclk)
         {
 
-            sleep(1);
-
             printf("current time is %d\n", x);
 
             while (pIdx < 10 && processes[pIdx]->arrivalTime == x) // fix this
@@ -302,6 +300,8 @@ int main(int argc, char *argv[])
                 pIdx++;
             }
             prevclk = x;
+
+            sleep(1);
         }
     }
 }

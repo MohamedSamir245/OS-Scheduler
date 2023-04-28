@@ -288,22 +288,41 @@ int getQuantum()
 struct treeNode
 {
     int id // -1 for empty segment
-        ,
-        start, size;
+        ,start
+        ,size
+        ,position;      // 0 => root  1 => right  -1 => left 
     struct treeNode *right;
     struct treeNode *left;
     struct treeNode *parent;
 };
 
-struct treeNode *createTreeNode(int st, int siz, struct treeNode *p)
+struct treeNode* createTreeNode(int start, int size, struct treeNode *parent)
 {
-    struct treeNode *temp = (struct treeNode *)malloc(sizeof(struct treeNode));
-    temp->start = st;
-    temp->size = siz;
-    temp->parent = p;
-    temp->left = NULL;
-    temp->right = NULL;
-    return temp;
+    struct treeNode *tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
+    tempNode->start = start;
+    tempNode->size = size;
+    tempNode->parent = parent;
+    tempNode->left = NULL;
+    tempNode->right = NULL;
+    return tempNode;
+}
+
+struct treeNode* mergeAfterDeleting(struct treeNode* deleted)
+{
+    struct treeNode* nodeParent;
+    while(deleted->parent && deleted->id == -1)
+    {
+        nodeParent = deleted->parent;
+        if((deleted->position == 1 && nodeParent->left->id == -1)
+        ||
+          (deleted->position == -1 && nodeParent->right->id == -1))       // this is a right child
+        {
+                nodeParent->right=NULL;
+                nodeParent->left=NULL;
+                deleted = nodeParent;
+        }
+    }
+    return deleted;
 }
 
 int allocateMemory(struct treeNode *leaves[], int size, int pSize)

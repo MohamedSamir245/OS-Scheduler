@@ -15,7 +15,7 @@ for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!
 
 For Samir and Ismail
 1. scheduler enters inf. loop
-2. process generator enter inf. loop when algo number input is wrong  
+2. process generator enter inf. loop when algo number input is wrong (not a number)
 -----------
 1. implement BST.
 2. put parent pointer in nodes to use them in merging

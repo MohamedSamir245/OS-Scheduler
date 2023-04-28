@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     // #######################
 
     while (runningProcess || processesNum < numOfProcesses) // Main loop
-    // while(getClk() < 60) // Temp for testing
+    // while (getClk() < 43) // Temp for testing
     {
         if (prevclk != getClk())
         {
@@ -208,7 +208,8 @@ int main(int argc, char *argv[])
             prevclk = getClk();
 
             // sleep(2);
-            utility_time++;
+            if (runningProcess) // TODO: correct?!
+                utility_time++;
         }
     }
 
@@ -303,9 +304,8 @@ void printSchedulerLog(int time, int pId, char *state, int arr, int total, int r
 
 void printSchedulerLog2(int time, int pId, char *state, int arr, int total, int remain, int wait, int TA, double WTA)
 {
-    fprintf(schedulerLog, "At time %d process %d %s arr %d total %d remain %d wait %d TA %d WTA %f\n", time, pId, state, arr, total, remain, wait, TA, WTA);
-    printf("At time %d process %d %s arr %d total %d remain %d wait %d TA %d WTA %f\n", time, pId, state, arr, total, remain, wait, TA, WTA);
-    // printf("At time %d process %d %s arr %d total %d remain %d wait %d\n", time, pId, state, arr, total, remain, wait);
+    fprintf(schedulerLog, "At time %d process %d %s arr %d total %d remain %d wait %d TA %d WTA %.2f\n", time, pId, state, arr, total, remain, wait, TA, WTA);
+    printf("At time %d process %d %s arr %d total %d remain %d wait %d TA %d WTA %.2f\n", time, pId, state, arr, total, remain, wait, TA, WTA);
 }
 
 void openSchedulerLog()
@@ -441,17 +441,17 @@ void finishProcess(struct Process *p)
     // Process__destroy(p); // TODO: Uncomment.
 }
 
-void calc_stat(struct Process *p)
+void clcStat(struct Process *p)
 {
     printf("Hello from calc_stat\n");
     // TODO: Uncomment.
-    // runningProcess->turnaroundTime = currentclk - runningProcess->arrivalTime;
-    // runningProcess->weightedTATime = runningProcess->turnaroundTime / runningProcess->executionTime;
-    // TA_arr[kk] = runningProcess->weightedTATime;
-    // kk++;
-    // sum_times += runningProcess->weightedTATime;
-    // runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
-    // sum_waiting += runningProcess->waitingTime;
+    runningProcess->turnaroundTime = currentclk - runningProcess->arrivalTime;
+    runningProcess->weightedTATime = runningProcess->turnaroundTime / runningProcess->executionTime;
+    TA_arr[kk] = runningProcess->weightedTATime;
+    kk++;
+    sum_times += runningProcess->weightedTATime;
+    runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
+    sum_waiting += runningProcess->waitingTime;
     // runningProcess = NULL;
 }
 
@@ -492,7 +492,7 @@ void switch_HPF()
     }
     else if (runningProcess && !runningProcess->remainingTime)
     {
-        calc_stat(runningProcess);
+        clcStat(runningProcess);
         finishProcess(runningProcess);
         if (qHead && peek(qHead))
         {
@@ -562,7 +562,7 @@ void switch_SRTN()
         }
         else if (!runningProcess->remainingTime)
         {
-            calc_stat(runningProcess);
+            clcStat(runningProcess);
             finishProcess(runningProcess);
             if (peek(qHead))
             {
@@ -600,7 +600,7 @@ void switch_RR()
     }
     else if (!runningProcess->remainingTime)
     {
-        calc_stat(runningProcess);
+        clcStat(runningProcess);
         finishProcess(runningProcess);
         runningProcess = peek(&qHead);
         if (runningProcess)

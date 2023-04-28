@@ -1,21 +1,23 @@
 For Taher and Mahmoud
 
+// SOLVED
 1.wait time not correct 
 pID=1 finished in 40
 PID=8 Started at 40 and arrived at 39 
 Wait time of 8 is 0!!!!!!!!!
 
-
+// SOLVED
 2.when process finish it prints process# started not finished
 
 
-3.start time of process not always right 
-for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 For Samir and Ismail
 1. scheduler enters inf. loop
 2. process generator enter inf. loop when algo number input is wrong (not a number)
+
+3.start time of process not always right  ---> it arrives late!!
+for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -----------
 1. implement BST.
 2. put parent pointer in nodes to use them in merging

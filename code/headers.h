@@ -325,7 +325,7 @@ struct treeNode* mergeAfterDeleting(struct treeNode* deleted)
     return deleted;
 }
 
-int allocateMemory(struct treeNode *leaves[], int size, int pSize)
+int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
 {
     // Get Best Fit
     int bestIdx = -1;
@@ -349,7 +349,15 @@ int allocateMemory(struct treeNode *leaves[], int size, int pSize)
         // Think about what you will do
         return -1;
     }
-    if (pSize <= leaves[bestIdx] / 2)
+    while (pSize <= leaves[bestIdx]->size / 2)
     {
+        struct treeNode *l = createTreeNode(leaves[bestIdx]->start, leaves[bestIdx]->size / 2, leaves[bestIdx]);
+        struct treeNode *r = createTreeNode(leaves[bestIdx]->start + leaves[bestIdx]->size, leaves[bestIdx]->size / 2, leaves[bestIdx]);
+        leaves[bestIdx]->left = l;
+        leaves[bestIdx]->right = r;
+        // add them to leaves array;
+        //  bestIdx=array.size()-2
+        // Think about how we will implement the array (you can declare with max size which is 1024 and use variable to indicate the actual size)
     }
+    leaves[bestIdx]->id = PID;
 }

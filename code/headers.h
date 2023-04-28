@@ -296,11 +296,12 @@ struct treeNode
     struct treeNode *parent;
 };
 
-struct treeNode* createTreeNode(int start, int size, struct treeNode *parent)
+struct treeNode* createTreeNode(int start, int size,int position, struct treeNode *parent)
 {
     struct treeNode *tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
     tempNode->start = start;
     tempNode->size = size;
+    tempNode->position= position;
     tempNode->parent = parent;
     tempNode->left = NULL;
     tempNode->right = NULL;

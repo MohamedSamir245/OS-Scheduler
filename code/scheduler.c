@@ -42,10 +42,10 @@ struct Process *runningProcess = NULL;
 int clock = 0;
 int quanta = 0;
 int RR_clock = 0;
-
+// For addProcess()
 int prevAddedProcessId = -1;
+// For schedulerLog
 FILE *schedulerLog;
-
 // For process shared memory
 int processShmid;
 int *processShmaddr;
@@ -273,8 +273,9 @@ void printSchedulerPerf()
     FILE *schedulerPerf;
     schedulerPerf = fopen("schedular.perf", "w");
 
-    fprintf(schedulerPerf, "CPU utilization = %d%%\n", 100.0 * utility_time / getClk());
-    printf("CPU utilization = %d%%\n", 100.0 * utility_time / getClk());
+    printf("utility_time = %d/ clk = %d\n", utility_time, getClk()); // Delete: Testing
+    fprintf(schedulerPerf, "CPU utilization = %d%%\n", (100.0 * utility_time) / getClk());
+    printf("CPU utilization = %d%%\n", (100.0 * utility_time) / getClk());
 
     double avg_wTA = 1.0 * sum_times / processesNum;
     fprintf(schedulerPerf, "Avg WTA = %d\n", avg_wTA);

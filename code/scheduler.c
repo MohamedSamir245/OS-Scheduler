@@ -275,24 +275,24 @@ void printSchedulerPerf()
     schedulerPerf = fopen("schedular.perf", "w");
 
     printf("utility_time = %d/ clk = %d\n", utility_time, getClk()); // Delete: Testing
-    fprintf(schedulerPerf, "CPU utilization = %d%%\n", (100.0 * utility_time) / getClk());
-    printf("CPU utilization = %d%%\n", (100.0 * utility_time) / getClk());
+    fprintf(schedulerPerf, "CPU utilization = %.2f%%\n", (100.0 * utility_time) / getClk());
+    printf("CPU utilization = %.2f%%\n", (100.0 * utility_time) / getClk());
 
     double avg_wTA = 1.0 * sum_times / processesNum;
-    fprintf(schedulerPerf, "Avg WTA = %d\n", avg_wTA);
-    printf("Avg WTA = %d\n", avg_wTA);
+    fprintf(schedulerPerf, "Avg WTA = %.2f\n", avg_wTA);
+    printf("Avg WTA = %.2f\n", avg_wTA);
 
-    fprintf(schedulerPerf, "Avg Waiting = %d\n", 1.0 * sum_waiting / processesNum);
-    printf("Avg Waiting = %d\n", 1.0 * sum_waiting / processesNum);
+    fprintf(schedulerPerf, "Avg Waiting = %.2f\n", 1.0 * sum_waiting / processesNum);
+    printf("Avg Waiting = %.2f\n", 1.0 * sum_waiting / processesNum);
 
     double squareSum = 0;
     for (int i = 0; i < kk; i++)
     {
         squareSum += (TA_arr[i] - avg_wTA) * (TA_arr[i] - avg_wTA);
     }
-    // double std = sqrt(squareSum / processesNum); // TODO: Uncomment.
-    // fprintf(schedulerPerf, "Std WTA = %d\n", std); // TODO: Uncommnet.
-    // printf("Std WTA = %d\n", std);
+    double std = squareRoot(squareSum / processesNum); // TODO: Uncomment.
+    fprintf(schedulerPerf, "Std WTA = %.2f\n", std);   // TODO: Uncommnet.
+    printf("Std WTA = %.2f\n", std);
 
     fclose(schedulerPerf);
 }

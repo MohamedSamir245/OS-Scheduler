@@ -449,7 +449,7 @@ void clcStat(struct Process *p)
     // printf("Hello from calc_stat\n");
     // TODO: Uncomment.
     runningProcess->turnaroundTime = currentclk - runningProcess->arrivalTime;
-    runningProcess->weightedTATime = runningProcess->turnaroundTime / runningProcess->executionTime;
+    runningProcess->weightedTATime = runningProcess->turnaroundTime * 1.0 / runningProcess->executionTime;
     TA_arr[kk] = runningProcess->weightedTATime;
     kk++;
     sum_times += runningProcess->weightedTATime;

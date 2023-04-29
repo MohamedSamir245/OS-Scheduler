@@ -22,6 +22,7 @@ For Samir and Ismail
 for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 4. (Two/Many) process enter at the same time.. it acceptes only one?!!
+
 -----------
 1. implement BST.
 2. put parent pointer in nodes to use them in merging

@@ -64,7 +64,7 @@ void Process__init(struct Process *self, int id, int ar, int run, int p)
     self->pId = -1;
 }
 
-void changecurrentstate(struct Process *self, int s)
+void changecurrentstate(struct Process *self, char *s)
 {
     self->currentState = s;
 }
@@ -289,7 +289,7 @@ struct treeNode
 {
     // id -1 for empty segment
     // position 0 => root  1 => right  -1 => left
-    int id ,start, size, position; 
+    int id, start, size, position;
     struct treeNode *right;
     struct treeNode *left;
     struct treeNode *parent;

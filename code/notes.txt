@@ -9,7 +9,7 @@ Wait time of 8 is 0!!!!!!!!!
 // SOLVED
 2.when process finish it prints process# started not finished
 
-
+3. scheduler.log WTA is int???!!
 
 
 For Samir and Ismail

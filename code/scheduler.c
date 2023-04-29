@@ -28,10 +28,10 @@ int algo = 1, currentclk; // TODO: receive algorithim value
 int utility_time = 0;
 double processesNum = 0;
 int numOfProcesses = 10; // TODO: get correct number from scheduler
-int sum_times = 0;
+float sum_times = 0;
 int sum_waiting = 0;
 
-int TA_arr[5000] = {0};
+float TA_arr[5000] = {0};
 int kk = 0;
 
 struct Node *qHead = NULL;
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     {
         if (prevclk != getClk())
         {
-            printf("----------------    current clk = %d    ----------------\n", getClk());
+            printf("\n\n----------------    current clk = %d    ----------------\n", getClk());
             if (runningProcess)
             {
                 runningProcess->remainingTime = *processShmaddr;
@@ -436,7 +436,7 @@ void stopProcess(struct Process *p)
 void finishProcess(struct Process *p)
 {
 
-    printf("Hello from finishProcess\n");
+    // printf("Hello from finishProcess\n");
     clcStat(p);
     p->currentState = "finished";
     printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
@@ -446,7 +446,7 @@ void finishProcess(struct Process *p)
 
 void clcStat(struct Process *p)
 {
-    printf("Hello from calc_stat\n");
+    // printf("Hello from calc_stat\n");
     // TODO: Uncomment.
     runningProcess->turnaroundTime = currentclk - runningProcess->arrivalTime;
     runningProcess->weightedTATime = runningProcess->turnaroundTime / runningProcess->executionTime;
@@ -474,13 +474,7 @@ void switch_HPF()
 
     if (!runningProcess && qHead)
     {
-        // printf("Delete: HPF - in peek\n");
-        // printf("Delete: qhead = %x\n",qHead);
-        // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
         runningProcess = peek(&qHead);
-        // printf("Delete: HPF - out peek\n");
-        // printf("Delete: HPF - in pop\n");
-        // printf("Running process address is %x\n  ", runningProcess);
         printf("remaining time = %d\n", runningProcess->remainingTime);
         if (runningProcess)
         {
@@ -491,7 +485,6 @@ void switch_HPF()
                 runProcess(runningProcess);
             }
         }
-        // printf("Delete: HPF - out pop\n");
     }
     else if (runningProcess && !runningProcess->remainingTime)
     {
@@ -499,9 +492,6 @@ void switch_HPF()
         if (qHead && peek(qHead))
         {
             runningProcess = peek(&qHead);
-            // printf("Delete: HPF - out peek\n");
-            // printf("Delete: HPF - in pop\n");
-            // printf("Running process address is %x\n  ", runningProcess);
             printf("remaining time = %d\n", runningProcess->remainingTime);
             if (runningProcess)
             {
@@ -524,9 +514,6 @@ void switch_SRTN()
 
     if (!runningProcess && qHead)
     {
-        // printf("Delete: SRTN - in peek\n");
-        // printf("Delete: qhead = %x\n",qHead);
-        // printf("Delete: qhead -> data = %x | qhead -> next = %x | qheaf -> priority =%d\n",qHead->data,qHead->next,qHead->priority);
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
@@ -537,11 +524,6 @@ void switch_SRTN()
                 runProcess(&runningProcess);
             }
         }
-        //        printf("Delete: SRTN - out peek\n");
-        //        printf("Delete: SRTN - in pop\n");
-        //        printf("Delete: SRTN - out pop\n");
-        // printf("Running process address is %x\n  ", runningProcess);
-        //        printf("remaining time = %d\n", runningProcess->remainingTime);
     }
     else if (runningProcess && qHead)
     {
@@ -660,8 +642,8 @@ void switchAlgo()
 // return pId on success | -1 on failure
 int runProcess(struct Process *p)
 {
-    printf("Hello from runProcess\n");
-    printf("p->remainingTime = %d\n", p->remainingTime);
+    // printf("Hello from runProcess\n");
+    // printf("p->remainingTime = %d\n", p->remainingTime);
     *processShmaddr = p->remainingTime;
     // printf("*processShmaddr = %d\n", *processShmaddr);
 
@@ -680,8 +662,7 @@ int runProcess(struct Process *p)
         execl("./process.out", "process", NULL);
     }
     p->currentState = "started";
-    printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
     // Print line in scheduler.log
-    // printSchedulerLog(...); // TODO: what is the parameters.
+    printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
     return p->pId;
 }

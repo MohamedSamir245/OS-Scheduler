@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
             // printf("\nBefore\n%d\n", __buf.msg_qnum);
 
             int currqnum = __buf.msg_qnum;
-            // while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
-            while (currqnum != prevqnum && getClk() < 45) // Temp for testing
+            while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
+            // while (currqnum != prevqnum && getClk() < 45) // Temp for testing
             {
                 rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
                 // __buf.msg_qnum--;

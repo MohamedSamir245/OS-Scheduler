@@ -287,9 +287,9 @@ int getQuantum()
 //=====================================================================
 struct treeNode
 {
-    int id // -1 for empty segment
-        ,
-        start, size, position; // 0 => root  1 => right  -1 => left
+    // id -1 for empty segment
+    // position 0 => root  1 => right  -1 => left
+    int id ,start, size, position; 
     struct treeNode *right;
     struct treeNode *left;
     struct treeNode *parent;
@@ -297,7 +297,8 @@ struct treeNode
 
 struct treeNode *createTreeNode(int start, int size, int position, struct treeNode *parent)
 {
-    struct treeNode *tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
+    struct treeNode *tempNode;
+    tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
     tempNode->start = start;
     tempNode->size = size;
     tempNode->position = position;

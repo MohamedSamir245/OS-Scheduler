@@ -13,9 +13,9 @@ void addProcess(struct Process *);
 void printSchedulerPerf();
 void Central_Processing_Unit();
 void switchAlgo();
-void switch_HPF();
-void switch_SRTN();
-void switch_RR();
+void switch_HPF();  // Algo 1
+void switch_SRTN(); // Algo 2
+void switch_RR();   // Algo 3
 int runProcess(struct Process *);
 void printSchedulerLog(int, int, char *, int, int, int, int);
 void printQueue();
@@ -23,7 +23,7 @@ void printQueue();
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
 // ===============================================================================================
-int algo = 1, currentclk; // TODO: receive algorithim value
+int algo = 3, currentclk; // TODO: receive algorithim value
 
 int utility_time = 0;
 double processesNum = 0;
@@ -40,7 +40,7 @@ struct Process *runningProcess = NULL;
 
 // For Round-Robin
 int clock = 0;
-int quanta = 0;
+int quanta = 5;
 int RR_clock = 0;
 // For addProcess()
 int prevAddedProcessId = -1;
@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
             // printf("\nBefore\n%d\n", __buf.msg_qnum);
 
             int currqnum = __buf.msg_qnum;
-            while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
-            // while (currqnum != prevqnum && getClk() < 45) // Temp for testing
+            // while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
+            while (currqnum != prevqnum && getClk() < 45) // Temp for testing
             {
                 rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
                 // __buf.msg_qnum--;
@@ -461,7 +461,7 @@ void clcStat(struct Process *p)
 // Scheduler fn.
 void Central_Processing_Unit()
 {
-    // printf("Hello from CPU\n");
+    printf("Hello from CPU\n");
     // printf("Delete: I am going to switch_algo_ossama\n");
     switchAlgo();
     // printf("Delete: I am now out switch_algo_ossama\n");
@@ -568,22 +568,11 @@ void switch_SRTN()
 // RR Algorithim
 void switch_RR()
 {
-    // printf("Hello from switch_RR\n");
+    printf("Hello from switch_RR\n");
 
     if (!runningProcess && qHead)
     {
-        runningProcess = peek(&qHead);
-        pop(&qHead);
-        if (runningProcess->startTime == -1)
-        {
-            runningProcess->startTime = currentclk;
-            runProcess(&runningProcess);
-        }
-        RR_clock = currentclk;
-    }
-    else if (!runningProcess->remainingTime)
-    {
-        finishProcess(runningProcess);
+        printf("if 1\n");
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
@@ -591,41 +580,64 @@ void switch_RR()
             if (runningProcess->startTime == -1)
             {
                 runningProcess->startTime = currentclk;
-                runProcess(&runningProcess);
-            }
-            else
-            {
-                resumeProcess(runningProcess);
+                runProcess(runningProcess);
             }
             RR_clock = currentclk;
         }
     }
-    else if (currentclk - RR_clock == quanta)
+    else if (runningProcess && !runningProcess->remainingTime)
     {
+        printf("if 2\n");
+        finishProcess(runningProcess);
+        if (qHead)
+        {
+            runningProcess = peek(&qHead);
+            if (runningProcess)
+            {
+                pop(&qHead);
+                if (runningProcess->startTime == -1)
+                {
+                    runningProcess->startTime = currentclk;
+                    runProcess(runningProcess);
+                }
+                else
+                {
+                    resumeProcess(runningProcess);
+                }
+                RR_clock = currentclk;
+            }
+        }
+    }
+    else if (runningProcess && currentclk - RR_clock == quanta)
+    {
+        printf("if 3\n");
         stopProcess(runningProcess);
         runningProcess->startTime = currentclk; //////////
         addProcess(runningProcess);
-        runningProcess = peek(&qHead);
-        if (runningProcess)
+        if (qHead)
         {
-            pop(&qHead);
-            if (runningProcess->startTime == -1)
+            runningProcess = peek(&qHead);
+            if (runningProcess)
             {
-                runningProcess->startTime = currentclk;
-                runProcess(&runningProcess);
+                pop(&qHead);
+                if (runningProcess->startTime == -1)
+                {
+                    runningProcess->startTime = currentclk;
+                    runProcess(runningProcess);
+                }
+                else
+                {
+                    resumeProcess(runningProcess);
+                }
+                RR_clock = currentclk;
             }
-            else
-            {
-                resumeProcess(runningProcess);
-            }
-            RR_clock = currentclk;
         }
     }
 }
 
 void switchAlgo()
 {
-    // printf("Hello from switchAlgo\n");
+    printf("Hello from switchAlgo\n");
     if (algo == 1)
     {
         switch_HPF();

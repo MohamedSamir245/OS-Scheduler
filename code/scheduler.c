@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
             {
                 runningProcess->remainingTime = *processShmaddr;
                 printf("Running Process id:%d and remaining time is:%d\n", runningProcess->id, runningProcess->remainingTime);
-                printf("*processShmaddr = %d\n", *processShmaddr);
+                // printf("*processShmaddr = %d\n", *processShmaddr);
             }
             else
                 printf("No running process now\n");
@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
 
             int currqnum = __buf.msg_qnum;
             while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
+            // while (currqnum != prevqnum && getClk() < 45) // Temp for testing
             {
                 rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
                 // __buf.msg_qnum--;
@@ -434,12 +435,13 @@ void stopProcess(struct Process *p)
 
 void finishProcess(struct Process *p)
 {
-    printf("Hello from finishProcess\n");
 
+    printf("Hello from finishProcess\n");
+    clcStat(p);
     p->currentState = "finished";
     printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
-
     // Process__destroy(p); // TODO: Uncomment.
+    runningProcess = NULL; // TODO: Uncomment.
 }
 
 void clcStat(struct Process *p)
@@ -493,7 +495,6 @@ void switch_HPF()
     }
     else if (runningProcess && !runningProcess->remainingTime)
     {
-        clcStat(runningProcess);
         finishProcess(runningProcess);
         if (qHead && peek(qHead))
         {
@@ -563,7 +564,6 @@ void switch_SRTN()
         }
         else if (!runningProcess->remainingTime)
         {
-            clcStat(runningProcess);
             finishProcess(runningProcess);
             if (peek(qHead))
             {
@@ -601,7 +601,6 @@ void switch_RR()
     }
     else if (!runningProcess->remainingTime)
     {
-        clcStat(runningProcess);
         finishProcess(runningProcess);
         runningProcess = peek(&qHead);
         if (runningProcess)
@@ -664,7 +663,7 @@ int runProcess(struct Process *p)
     printf("Hello from runProcess\n");
     printf("p->remainingTime = %d\n", p->remainingTime);
     *processShmaddr = p->remainingTime;
-    printf("*processShmaddr = %d\n", *processShmaddr);
+    // printf("*processShmaddr = %d\n", *processShmaddr);
 
     // p->startTime = currentclk;
 

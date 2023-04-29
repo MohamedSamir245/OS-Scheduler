@@ -43,7 +43,7 @@ struct Process
     int remainingTime;
     char *currentState;
     int turnaroundTime;
-    int weightedTATime;
+    float weightedTATime;
     int startTime;
     int waitingTime;
     int pId;

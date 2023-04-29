@@ -19,6 +19,7 @@ void switch_RR();   // Algo 3
 int runProcess(struct Process *);
 void printSchedulerLog(int, int, char *, int, int, int, int);
 void printQueue();
+void printRemainingTime();
 
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
@@ -132,14 +133,7 @@ int main(int argc, char *argv[])
         if (prevclk != getClk())
         {
             printf("\n\n----------------    current clk = %d    ----------------\n", getClk());
-            if (runningProcess)
-            {
-                runningProcess->remainingTime = *processShmaddr;
-                printf("Running Process id:%d and remaining time is:%d\n", runningProcess->id, runningProcess->remainingTime);
-                // printf("*processShmaddr = %d\n", *processShmaddr);
-            }
-            else
-                printf("No running process now\n");
+
             // ====================
             // Reading Process from SHM
             // ====================
@@ -191,7 +185,6 @@ int main(int argc, char *argv[])
 
                 addProcess(pAdd);
                 prevAddedProcessId = ttt->id;
-                printQueue();
 
                 if (ttt->id > processesNum)
                     processesNum = ttt->id;
@@ -204,8 +197,21 @@ int main(int argc, char *argv[])
             // ====================
             currentclk = getClk();
             Central_Processing_Unit(); // TODO: Uncomment.
+            // ====================
+            // Some print after CPU
+            // ====================
+            if (runningProcess)
+            {
+                runningProcess->remainingTime = *processShmaddr;
+                printf("Running Process id:%d and remaining time is:%d\n", runningProcess->id, runningProcess->remainingTime);
+                // printf("*processShmaddr = %d\n", *processShmaddr);
+            }
+            else
+                printf("No running process now\n");
             // After schedule process.. increase waiting time to other processes
             increaseWaitTime();
+            printQueue();
+            printRemainingTime();
             prevclk = getClk();
 
             // sleep(2);
@@ -246,6 +252,22 @@ void increaseWaitTime()
         {
             temp->data->waitingTime++;
             printf("%d(%d) ", temp->data->id, temp->data->waitingTime);
+            temp = temp->next;
+        }
+        printf("\n");
+    }
+}
+
+void printRemainingTime()
+{
+    struct Node *temp = qHead;
+
+    if (temp)
+    {
+        printf("p(remain) : ");
+        while (temp && temp->data != NULL)
+        {
+            printf("%d(%d) ", temp->data->id, temp->data->remainingTime);
             temp = temp->next;
         }
         printf("\n");
@@ -418,6 +440,7 @@ void addProcess(struct Process *pNew)
 void resumeProcess(struct Process *p)
 {
     printf("Hello from resumeProcess\n");
+    *processShmaddr = p->remainingTime;
 
     p->currentState = "resumed";
     kill(p->pId, SIGCONT);
@@ -461,7 +484,7 @@ void clcStat(struct Process *p)
 // Scheduler fn.
 void Central_Processing_Unit()
 {
-    printf("Hello from CPU\n");
+    // printf("Hello from CPU\n");
     // printf("Delete: I am going to switch_algo_ossama\n");
     switchAlgo();
     // printf("Delete: I am now out switch_algo_ossama\n");
@@ -514,6 +537,7 @@ void switch_SRTN()
 
     if (!runningProcess && qHead)
     {
+        printf("if 1\n");
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
@@ -527,8 +551,10 @@ void switch_SRTN()
     }
     else if (runningProcess && qHead)
     {
+        printf("if 2\n");
         if (peek(&qHead) && peek(&qHead)->remainingTime < runningProcess->remainingTime)
         {
+            printf("if 2.1\n");
             stopProcess(runningProcess);
             runningProcess->startTime = currentclk; //////////
             addProcess(runningProcess);
@@ -546,6 +572,7 @@ void switch_SRTN()
         }
         else if (!runningProcess->remainingTime)
         {
+            printf("if 2.2\n");
             finishProcess(runningProcess);
             if (peek(&qHead))
             {
@@ -637,7 +664,7 @@ void switch_RR()
 
 void switchAlgo()
 {
-    printf("Hello from switchAlgo\n");
+    // printf("Hello from switchAlgo\n");
     if (algo == 1)
     {
         switch_HPF();

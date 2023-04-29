@@ -521,7 +521,7 @@ void switch_SRTN()
             if (runningProcess->startTime == -1)
             {
                 runningProcess->startTime = currentclk;
-                runProcess(&runningProcess);
+                runProcess(runningProcess);
             }
         }
     }

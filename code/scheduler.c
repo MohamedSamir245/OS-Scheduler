@@ -23,7 +23,7 @@ void printQueue();
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
 // ===============================================================================================
-int algo = 3, currentclk; // TODO: receive algorithim value
+int algo = 2, currentclk; // TODO: receive algorithim value
 
 int utility_time = 0;
 double processesNum = 0;
@@ -527,7 +527,7 @@ void switch_SRTN()
     }
     else if (runningProcess && qHead)
     {
-        if (peek(qHead) && peek(&qHead)->remainingTime < runningProcess->remainingTime)
+        if (peek(&qHead) && peek(&qHead)->remainingTime < runningProcess->remainingTime)
         {
             stopProcess(runningProcess);
             runningProcess->startTime = currentclk; //////////
@@ -537,7 +537,7 @@ void switch_SRTN()
             if (runningProcess->startTime == -1)
             {
                 runningProcess->startTime = currentclk;
-                runProcess(&runningProcess);
+                runProcess(runningProcess);
             }
             else
             {
@@ -547,14 +547,14 @@ void switch_SRTN()
         else if (!runningProcess->remainingTime)
         {
             finishProcess(runningProcess);
-            if (peek(qHead))
+            if (peek(&qHead))
             {
                 runningProcess = peek(&qHead);
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
                     runningProcess->startTime = currentclk;
-                    runProcess(&runningProcess);
+                    runProcess(runningProcess);
                 }
                 else
                 {

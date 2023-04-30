@@ -24,7 +24,7 @@ void printRemainingTime();
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
 // ===============================================================================================
-int algo = 3, currentclk; // TODO: receive algorithim value
+int currentclk; // TODO: receive algorithim value
 
 int utility_time = 0;
 double processesNum = 0;
@@ -62,6 +62,11 @@ int main(int argc, char *argv[])
     // #######################
 
     initClk();
+
+    // algo = getAlgo();
+    // printf("Algo %d", algo);
+    // quanta = getQuantum();
+    // printf("quanta %d", quanta);
 
     // ####################### Memory between process and scheduler
     key_t key_id;
@@ -111,6 +116,28 @@ int main(int argc, char *argv[])
     struct Process *shmaddr = (struct Process *)shmat(schedulerShmId, (void *)0, 0);
     struct msgbuff message;
 
+    int rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+    while (rec_val == -1)
+    {
+        perror("Errror in rec alg num");
+        rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+    }
+
+    algo = message.request;
+    // printf("Algoooooooooooooooo %d", algo);
+
+    if (algo == 3)
+    {
+        rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+        while (rec_val == -1)
+        {
+            perror("Errror in rec quan num");
+            rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+        }
+        quanta = message.request;
+    }
+    // printf("Quantum %d", quanta);
+
     // for (int i = 0; i < 5; i++)
     // {
     struct Process *ttt;
@@ -121,7 +148,7 @@ int main(int argc, char *argv[])
 
     msgctl(mesq_id, IPC_STAT, &__buf);
     int prevqnum = __buf.msg_qnum;
-    int rec_val;
+    rec_val;
 
     // #######################
     // ####################### Main loop
@@ -143,16 +170,26 @@ int main(int argc, char *argv[])
             // printf("\nBefore\n%d\n", __buf.msg_qnum);
 
             int currqnum = __buf.msg_qnum;
-            while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
+
+            // while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
             // while (currqnum != prevqnum && getClk() < 45) // Temp for testing
+            // {
+            //     printf("Curr Quan before rec     %d\n", currqnum);
+            //     printf("Prev Quan before rec     %d\n", prevqnum);
+
+            //     printf("Buffer QNUM  Before  %d\n", __buf.msg_qnum);
+            // rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, IPC_NOWAIT);
+            //     printf("Buffer QNUM  After  %d\n", __buf.msg_qnum);
+
+            // __buf.msg_qnum--;
+            // msgctl(mesq_id, IPC_SET, &__buf);
+            // msgctl(mesq_id, IPC_RMID, NULL);
+
+            // printf("\nAfter\n%d\n", __buf.msg_qnum);
+
+            while (__buf.msg_qnum > 0)
             {
                 rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
-                // __buf.msg_qnum--;
-                // msgctl(mesq_id, IPC_SET, &__buf);
-                // msgctl(mesq_id, IPC_RMID, NULL);
-
-                // printf("\nAfter\n%d\n", __buf.msg_qnum);
-
                 if (message.request == 1)
                 {
 
@@ -164,11 +201,15 @@ int main(int argc, char *argv[])
                     // printf("Ismail exit read\n");
                     // printf("Isamil out read if\n"); // TODO: KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
                 }
-
-                // printf("Isamil out read if 1\n");
-                prevqnum = currqnum;
-                // printf("Isamil out read if 2\n");
             }
+
+            // printf("Isamil out read if 1\n");
+            // prevqnum = currqnum;
+
+            // printf("Curr Quan بعد rec     %d\n", currqnum);
+            // printf("Prev Quan بعد rec     %d\n", prevqnum);
+            // printf("Isamil out read if 2\n");
+            // }
             // printf("Delete: i am before if\n");
 
             // ====================

@@ -231,42 +231,32 @@ int main(int argc, char *argv[])
     // message.mtype = 1;
     // message.request = 1;
 
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-    // send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
-
     // if (send_val == -1)
     //     perror("Errror in send");
     // writer(schedulerShmId, 50, 10, 20, 30, 40, 800);
 
     // printf("Ismail Enters writer\n");
 
+    message.mtype = 1;
+    message.request = al;
+
+    int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+    while (send_val == -1)
+    {
+        perror("Errror in send alg num");
+        send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+    }
+
+    if (al == 3)
+    {
+        message.request = Quantum;
+        send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+        while (send_val == -1)
+        {
+            perror("Errror in send quan num");
+            send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+        }
+    }
     //
     int pIdx = 0;
     // printf("%d", processes[pIdx]->arrivalTime);

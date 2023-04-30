@@ -166,10 +166,12 @@ int main(int argc, char *argv[])
             // ====================
 
             msgctl(mesq_id, IPC_STAT, &__buf);
+            printf("169 - currentClk = %d\n", getClk());
 
             // printf("\nBefore\n%d\n", __buf.msg_qnum);
 
             int currqnum = __buf.msg_qnum;
+            printf("174 - currentClk = %d\n", getClk());
 
             // while (currqnum != prevqnum) // TODO: FIX expected inf. loop.
             // while (currqnum != prevqnum && getClk() < 45) // Temp for testing
@@ -189,16 +191,19 @@ int main(int argc, char *argv[])
 
             if (__buf.msg_qnum > 0)
             {
+                printf("194 - currentClk = %d\n", getClk());
                 rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, IPC_NOWAIT);
                 // if (rec_val) == -1)
+                printf("197 - currentClk = %d\n", getClk());
 
                 if (message.request == 1)
                 {
-
+                    printf("201 - currentClk = %d\n", getClk());
                     // printf("Ismail Enters read 999\n");
                     ttt = reader(schedulerShmId); // TODO: need modification to read all added processes
                                                   // it reads only one
-                    // int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+                                                  // int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
+                    printf("206 - currentClk = %d\n", getClk());
 
                     // printf("Ismail exit read\n");
                     // printf("Isamil out read if\n"); // TODO: KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
@@ -219,47 +224,69 @@ int main(int argc, char *argv[])
             // ====================
             if (ttt && ttt->executionTime != 0 && ttt->id != prevAddedProcessId)
             {
+                printf("227 - currentClk = %d\n", getClk());
                 // printf("Delete: i am in if\n");
                 // do something
                 struct Process *pAdd;
                 pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority);
                 // runningProcess->startTime = currentclk; //////////
                 // printf("Current time from addProcess here for Process %d is %d", pNew->id, currentclk);
+                printf("234 - currentClk = %d\n", getClk());
 
                 addProcess(pAdd);
+                printf("237 - currentClk = %d\n", getClk());
                 prevAddedProcessId = ttt->id;
+                printf("239 - currentClk = %d\n", getClk());
 
                 if (ttt->id > processesNum)
                     processesNum = ttt->id;
                 // use data;
                 // printf("Delete: i am going out if\n");
+                printf("245 - currentClk = %d\n", getClk());
             }
 
             // ====================
             // Run scheduling algorithim
             // ====================
             currentclk = getClk();
+            printf("253 - currentClk = %d\n", getClk());
+
             Central_Processing_Unit(); // TODO: Uncomment.
+            printf("256 - currentClk = %d\n", getClk());
+
             // ====================
             // Some print after CPU
             // ====================
             if (runningProcess)
             {
+                printf("263 - currentClk = %d\n", getClk());
+
                 runningProcess->remainingTime = *processShmaddr;
-                printf("Running Process id:%d and remaining time is:%d\n", runningProcess->id, runningProcess->remainingTime);
+                printf("Running Process id(wait):%d(%d) and remaining time is:%d\n", runningProcess->id, runningProcess->waitingTime, runningProcess->remainingTime);
                 // printf("*processShmaddr = %d\n", *processShmaddr);
+                printf("268 - currentClk = %d\n", getClk());
             }
             else
                 printf("No running process now\n");
+            printf("273 - currentClk = %d\n", getClk());
+
             // After schedule process.. increase waiting time to other processes
             increaseWaitTime();
+            printf("277 - currentClk = %d\n", getClk());
+
             printQueue();
+            printf("280 - currentClk = %d\n", getClk());
+
             printRemainingTime();
+            printf("283 - currentClk = %d\n", getClk());
+
             prevclk = getClk();
+            printf("286 - currentClk = %d\n", getClk());
 
             // sleep(2);
             if (runningProcess) // TODO: correct?!
                 utility_time++;
+            printf("292 - currentClk = %d\n", getClk());
         }
     }
 
@@ -520,7 +547,7 @@ void clcStat(struct Process *p)
     TA_arr[kk] = runningProcess->weightedTATime;
     kk++;
     sum_times += runningProcess->weightedTATime;
-    runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
+    // runningProcess->waitingTime = runningProcess->startTime - runningProcess->arrivalTime;
     sum_waiting += runningProcess->waitingTime;
     // runningProcess = NULL;
 }

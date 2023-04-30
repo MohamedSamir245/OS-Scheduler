@@ -23,9 +23,15 @@ Wait time of 8 is 0!!!!!!!!!
 // SOLVED
 3. scheduler.log, WTA is int???!!
 
+// SOLVED
 4. scheduler.log, "Wait" increases by 1 in finish?!!
 
+// SOLVED
 5. SRTN Algo freezes the system.
+
+6. HPF ?
+7. SRTN ?
+8. RR ?
 
 ========================================================================================
 For Samir and Ismail
@@ -36,13 +42,11 @@ For Samir and Ismail
 //SOLVED الحمد لله
 2. process generator enter inf. loop when algo number input is wrong (not a number)
 
-
-//المشكلة من عندكوا عشان مشينا وراها لقينا الفانشكشنز بتاخد وقت على متخلص وانت بتحسب الستارت جوه واحد منهم فبيحسبه غلط المفروض تسجله فى البداية
+//المشكلة من عندكوا عشان مشينا وراها لقينا الفانشكشنز بتاخد وقت على متخلص وانت بتحسب الستارت جوه واحد منهم فبيحسبه غلط المفروض تسجله فى البداية ---> Not Right. it sometimes arrives late to the shm!! 
 3. start time of process not always right  ---> it arrives late!!
 for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-//هاااااااااااااااااااااااااااااااااااااااااااااااام مش راضية تتظبط احنا هنكمل جزئنا فى  فيز 2 ودى اشتغلوا عليها انتوا 
+//هاااااااااااااااااااااااااااااااااااااااااااااااام مش راضية تتظبط احنا هنكمل جزئنا فى  فيز 2 ودى اشتغلوا عليها انتوا --> IMMMMMMMMMMMMMMMMMMMMMMMMP.. NOT ALLOWED
 4. (Two/Many) process enter at the same time.. it acceptes only one?!!
 
 -----------

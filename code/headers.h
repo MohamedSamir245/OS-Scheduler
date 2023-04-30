@@ -351,12 +351,12 @@ struct treeNode *mergeAfterDeleting(struct treeNode *deleted)
     return deleted;
 }
 
-int allocateMemory(struct treeNode *leaves[], int *size, int pSize, int PID)
+int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
 {
     // Get Best Fit
     int bestIdx = -1;
 
-    for (int i = 0; i < *size; i++)
+    for (int i = 0; i < size; i++)
     {
         if (pSize == leaves[i]->size)
         {
@@ -394,7 +394,7 @@ int allocateMemory(struct treeNode *leaves[], int *size, int pSize, int PID)
         // Think about how we will implement the array (you can declare with max size which is 1024 and use variable to indicate the actual size)
     }
     leaves[bestIdx]->id = PID;
-    *size++;
+    size++;
 
     return bestIdx;
 }

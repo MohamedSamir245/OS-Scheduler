@@ -30,13 +30,19 @@ Wait time of 8 is 0!!!!!!!!!
 ========================================================================================
 For Samir and Ismail
 
+//SOLVED الحمد لله
 1. scheduler enters inf. loop
 
+//SOLVED الحمد لله
 2. process generator enter inf. loop when algo number input is wrong (not a number)
 
+
+//المشكلة من عندكوا عشان مشينا وراها لقينا الفانشكشنز بتاخد وقت على متخلص وانت بتحسب الستارت جوه واحد منهم فبيحسبه غلط المفروض تسجله فى البداية
 3. start time of process not always right  ---> it arrives late!!
 for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+//هاااااااااااااااااااااااااااااااااااااااااااااااام مش راضية تتظبط احنا هنكمل جزئنا فى  فيز 2 ودى اشتغلوا عليها انتوا 
 4. (Two/Many) process enter at the same time.. it acceptes only one?!!
 
 -----------

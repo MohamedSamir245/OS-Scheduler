@@ -157,8 +157,6 @@ int main(int argc, char *argv[])
 
     setAlgoAndQuantum(al, Quantum);
 
-    //
-
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
     schedulerShmId = shmget(350, 128, IPC_CREAT | 0644);
 

@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
             rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
         }
         quanta = message.request;
-        printf("Quantum %d", quanta);
+        printf("Quantum %d\n", quanta);
     }
 
     // for (int i = 0; i < 5; i++)

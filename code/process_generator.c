@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     FILE *fp;
 
     char con[1000];
-    fp = fopen("processes.txt", "r");
+    fp = fopen(argv[1], "r");
 
     if (!fp)
     {
@@ -102,15 +102,18 @@ int main(int argc, char *argv[])
     // fgets(con, 1000, fp);
 
     int k = 0;
+    int totalNumOfProcesses = 0;
     while (fscanf(fp, "%d %d %d %d", &id, &arTime, &runTime, &Prio) == 4)
     {
         printf("%d %d %d %d\n", id, arTime, runTime, Prio);
 
         processes[k++] = Process__create(id, arTime, runTime, Prio);
+        totalNumOfProcesses++;
 
         // here create a process and add it to the array
     }
 
+    // printf("flakgkndk;jgna       %d", totalNumOfProcesses);
     for (int i = 0; i < k; i++)
     {
         printf("PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", processes[i]->id, processes[i]->executionTime, processes[i]->arrivalTime, processes[i]->priority, processes[i]->remainingTime, processes[i]->finishTime);
@@ -120,32 +123,37 @@ int main(int argc, char *argv[])
 
     fclose(fp);
 
-    printf("Choose the algorithm\n");
-    printf("1 = HPF, 2 = SRTN, 3 = RR\n");
+    // printf("Choose the algorithm\n");
+    // printf("1 = HPF, 2 = SRTN, 3 = RR\n");
     int al = 0;
 
-    while (al != 1 && al != 2 && al != 3)
-    {
-        scanf("%d", &al);
-        if (al != 1 && al != 2 && al != 3)
-        {
-            printf("Choose from 1, 2 or 3\n");
-        }
-    }
-    int Quantum = -1;
+    // while (al != 1 && al != 2 && al != 3)
+    // {
+    //     scanf("%d", &al);
+    //     if (al != 1 && al != 2 && al != 3)
+    //     {
+    //         printf("Choose from 1, 2 or 3\n");
+    //     }
+    // }
+    al = atoi(argv[3]);
+
+    int Quantum;
 
     if (al == 3)
-    {
-        printf("Enter the Quantum\n");
-        while (Quantum <= 0)
-        {
-            scanf("%d", &Quantum);
-            if (Quantum <= 0)
-            {
-                printf("Quantum must be greater than ZERO\n");
-            }
-        }
-    }
+        Quantum = atoi(argv[5]);
+
+    // if (al == 3)
+    // {
+    //     printf("Enter the Quantum\n");
+    //     while (Quantum <= 0)
+    //     {
+    //         scanf("%d", &Quantum);
+    //         if (Quantum <= 0)
+    //         {
+    //             printf("Quantum must be greater than ZERO\n");
+    //         }
+    //     }
+    // }
 
     setAlgoAndQuantum(al, Quantum);
 
@@ -265,6 +273,7 @@ int main(int argc, char *argv[])
 
     while (true)
     {
+
         x = getClk();
 
         if (x != prevclk)
@@ -272,7 +281,7 @@ int main(int argc, char *argv[])
 
             printf("current time is %d\n", x);
 
-            while (pIdx < 10 && processes[pIdx]->arrivalTime == x) // fix this
+            while (pIdx < totalNumOfProcesses && processes[pIdx]->arrivalTime == x) // fix this
             {
                 printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
                 // here we send it to the scheduler

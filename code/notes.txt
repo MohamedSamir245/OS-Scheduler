@@ -49,6 +49,8 @@ for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!
 //هاااااااااااااااااااااااااااااااااااااااااااااااام مش راضية تتظبط احنا هنكمل جزئنا فى  فيز 2 ودى اشتغلوا عليها انتوا --> IMMMMMMMMMMMMMMMMMMMMMMMMP.. NOT ALLOWED
 4. (Two/Many) process enter at the same time.. it acceptes only one?!!
 
+5. Algo 2 & 3 give "segmentation fault (core dumped)"
+
 -----------
 1. implement BST.
 2. put parent pointer in nodes to use them in merging

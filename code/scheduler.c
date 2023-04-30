@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     // TODO implement the scheduler :)
     // upon termination release the clock resources.
 
-    int schedulerShmId = shmget(250, 128, IPC_CREAT | 0644);
+    int schedulerShmId = shmget(350, 128, IPC_CREAT | 0644);
     int mesq_id = msgget(250, 0666 | IPC_CREAT);
 
     if ((long)schedulerShmId == -1)
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     }
 
     algo = message.request;
-    // printf("Algoooooooooooooooo %d", algo);
+    printf("Algoooooooooooooooo %d", algo);
 
     if (algo == 3)
     {
@@ -135,8 +135,8 @@ int main(int argc, char *argv[])
             rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
         }
         quanta = message.request;
+        printf("Quantum %d", quanta);
     }
-    // printf("Quantum %d", quanta);
 
     // for (int i = 0; i < 5; i++)
     // {
@@ -187,9 +187,11 @@ int main(int argc, char *argv[])
 
             // printf("\nAfter\n%d\n", __buf.msg_qnum);
 
-            while (__buf.msg_qnum > 0)
+            if (__buf.msg_qnum > 0)
             {
-                rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, !IPC_NOWAIT);
+                rec_val = msgrcv(mesq_id, &message, sizeof(message.request), 0, IPC_NOWAIT);
+                // if (rec_val) == -1)
+
                 if (message.request == 1)
                 {
 
@@ -391,6 +393,7 @@ struct Process *reader(int shmid)
     if (shmaddr == -1)
     {
         perror("Error in attach in reader");
+        // printf("hhhhhhhhhhhhh");
         exit(-1);
     }
     // printf("\nReader: Shared memory attached at address %x\n", shmaddr);

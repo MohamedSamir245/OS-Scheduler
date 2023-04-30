@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     //
 
     shmid = shmget(SHKEY, 4, IPC_CREAT | 0644);
-    schedulerShmId = shmget(250, 128, IPC_CREAT | 0644);
+    schedulerShmId = shmget(350, 128, IPC_CREAT | 0644);
 
     mesq_id = msgget(250, 0666 | IPC_CREAT);
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
     // 4. Use this function after creating the clock process to initialize clock
     initClk();
     // To get time use this
-    int x = getClk();
+    int prevclk = getClk();
 
     // system("'./clkScript.sh' &");
     // system("'./schedulerScript.sh' &");
@@ -261,11 +261,11 @@ int main(int argc, char *argv[])
     int pIdx = 0;
     // printf("%d", processes[pIdx]->arrivalTime);
 
-    int prevclk = getClk();
+    int x = getClk();
 
     while (true)
     {
-        int x = getClk();
+        x = getClk();
 
         if (x != prevclk)
         {
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
                 message.mtype = 1;
                 message.request = 1;
 
-                int send_val = msgsnd(mesq_id, &message, sizeof(message.request), IPC_NOWAIT);
+                int send_val = msgsnd(mesq_id, &message, sizeof(message.request), !IPC_NOWAIT);
                 if (send_val == -1)
                     perror("Errror in send");
 
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
             }
             prevclk = x;
 
-            sleep(1);
+            // sleep(1);
         }
     }
 }

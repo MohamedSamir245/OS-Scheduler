@@ -49,7 +49,9 @@ struct treeNode *mergeAfterDeleting(struct treeNode *deleted)
     return deleted;
 }
 
-int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
+struct treeNode *leaves[1] = {NULL};
+
+int allocateMemory(int size, int pSize, int PID)
 {
     // Get Best Fit
     printf("inside allocateMemory");
@@ -150,6 +152,103 @@ void deallocateMemoryFF(struct Process *p)
     p->startLocation = -1;
 }
 
+struct memUnit
+{
+    int startLoc;
+    int size;
+    int f;
+
+    struct memUnit *next;
+    struct memUnit *previous;
+};
+
+struct memUnit *create_mem_unit(int st, int sz, int f, struct memUnit *n, struct memUnit *pre)
+{
+    struct memUnit *unit = (struct memUnit *)malloc(sizeof(struct memUnit));
+
+    unit->startLoc = st;
+    unit->next = n;
+    unit->f = f;
+    unit->size = sz;
+    unit->previous = pre;
+
+    return unit;
+}
+
+void divideUnit(struct memUnit *u)
+{
+    u->size = u->size / 2;
+    struct memUnit *new = create_mem_unit(u->startLoc + u->size, u->size, 1, u->next, u);
+    u->next = new;
+}
+
+void allocateMemoryBSA(struct memUnit *mem, struct Process *process)
+{
+    int sz = process->memSize;
+    int bestIdx = -1;
+    int currIdx = 0;
+    int bestsz = -1;
+    struct memUnit *p;
+
+    p = mem;
+    while (p)
+    {
+        if (sz == p->size && p->f == 1)
+        {
+            bestIdx = currIdx;
+            break;
+        }
+        if (sz < p->size && p->f == 1)
+        {
+            if (bestsz = -1)
+            {
+                bestsz = p->size;
+                bestIdx = currIdx;
+            }
+            else if (p->size < bestsz)
+            {
+                bestsz = p->size;
+                bestIdx = currIdx;
+            }
+        }
+        currIdx++;
+        if (bestIdx == -1 && p->size >= sz && p->f == 1)
+        {
+            bestIdx = currIdx;
+        }
+        p = p->next;
+    }
+
+    if (bestIdx == -1)
+    {
+        if (p && p->size < sz || !p)
+            printf("Can't allocate memory BSA\n");
+
+        return;
+    }
+
+    struct memUnit *bestfit = mem;
+
+    for (int i = 0; i < bestIdx; i++)
+    {
+        bestfit = bestfit->next;
+    }
+
+    while (bestfit->size / 2 >= sz)
+    {
+        divideUnit(bestfit);
+    }
+
+    bestfit->f = 0;
+
+    for (int i = bestfit->startLoc; i < bestfit->startLoc + process->memSize; i++)
+    {
+        memory[i] = 1;
+    }
+
+    printf("memory allocated BSA\n");
+}
+
 int main()
 {
     // struct treeNode *root = (struct treeNode *)createTreeNode(0, 1024, 0, NULL);
@@ -160,8 +259,8 @@ int main()
 
     // int currSize = 1;
 
-    // array[0] = root;
-    // printf("%d\n", array[0]->start);
+    // leaves[0] = root;
+    // printf("%d\n", leaves[0]->start);
     // printf("%d\n", array[0]->size);
 
     int psize1 = 300;
@@ -179,19 +278,26 @@ int main()
     p3->memSize = psize3;
     p4->memSize = psize4;
 
-    allocateMemoryFF(p1);
-    allocateMemoryFF(p2);
-    allocateMemoryFF(p3);
-    allocateMemoryFF(p4);
+    // allocateMemoryFF(p1);
+    // allocateMemoryFF(p2);
+    // allocateMemoryFF(p3);
+    // allocateMemoryFF(p4);
 
-    // printf("here\n");
+    struct memUnit *mem = create_mem_unit(0, 1024, 1, NULL, NULL);
+
+    allocateMemoryBSA(mem, p1);
+    allocateMemoryBSA(mem, p2);
+    allocateMemoryBSA(mem, p3);
+    allocateMemoryBSA(mem, p4);
+
+    printf("here\n");
 
     // printf("size: %d, pSize: %d\n", currSize, psize1);
 
     // allocateMemory(array, currSize, psize1, 1);
     // printf("size: %d, pSize: %d\n", currSize, psize1);
 
-    // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize1, 1), currSize);
+    // printf("Allocated = %d, Now size is %d", allocateMemory(currSize, psize1, 1), currSize);
     // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize2, 2), currSize);
     // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize3, 3), currSize);
     // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize4, 4), currSize);

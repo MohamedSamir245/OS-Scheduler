@@ -6,6 +6,10 @@ For All
 1. Clk Problems
 1. Clk Problems
 1. Clk Problems
+1. Clk Problems
+1. Clk Problems
+1. Clk Problems
+1. Clk Problems
 
 
 ==============================================
@@ -36,6 +40,11 @@ Wait time of 8 is 0!!!!!!!!!
 ========================================================================================
 For Samir and Ismail
 
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXXXXXXXX VERY IMPORTANT XXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+5. Sometimes at the begining of schedule [Segmentation fault (core dumped)] in all algorithims.
+
 //SOLVED الحمد لله
 1. scheduler enters inf. loop
 
@@ -43,6 +52,9 @@ For Samir and Ismail
 2. process generator enter inf. loop when algo number input is wrong (not a number)
 
 //المشكلة من عندكوا عشان مشينا وراها لقينا الفانشكشنز بتاخد وقت على متخلص وانت بتحسب الستارت جوه واحد منهم فبيحسبه غلط المفروض تسجله فى البداية ---> Not Right. it sometimes arrives late to the shm!! 
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXXXXXXXX VERY IMPORTANT XXXXXXXXXXXXXXXXXXX
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 3. start time of process not always right  ---> it arrives late!!
 for process 1 it arrived at 11 and its start-time is 12!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

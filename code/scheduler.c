@@ -55,6 +55,9 @@ FILE *schedulerLog;
 int processShmid;
 int *processShmaddr;
 
+// For Memory
+int Memory[1024] = {0};
+
 // ===============================================================================================
 // =====================================    Code   ===============================================
 // ===============================================================================================
@@ -130,7 +133,7 @@ int main(int argc, char *argv[])
     }
 
     algo = message.request;
-    printf("Algoooooooooooooooo %d", algo);
+    printf("Algoooooooooooooooo %d\n", algo);
 
     if (algo == 3)
     {
@@ -767,4 +770,53 @@ int runProcess(struct Process *p)
     p->currentState = "started";
     printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
     return p->pId;
+}
+
+void allocateMemoryFF(struct Process *p)
+{
+    int st = -1;
+    int j, i;
+    for (i = 0; i < 1024; i++)
+    {
+        if (memory[i] == 0)
+        {
+            for (j = i; j < 1024; j++)
+            {
+
+                if (memory[j] != 0)
+                    break;
+
+                if (j == i - 1 + p->memSize)
+                {
+                    st = i;
+                    break;
+                }
+            }
+
+            if (st != -1)
+                break;
+            i = j;
+        }
+    }
+    if (st != -1)
+    {
+        for (i = st; i < st + p->memSize; i++)
+            memory[i] = 1;
+        p->startLocation = st;
+
+        printf("Memory allocation FF done\n");
+    }
+    else
+    {
+        printf("Memory allocation FF Failed\n");
+    }
+}
+
+void deallocateMemoryFF(struct Process *p)
+{
+    for (int i = p->startLocation; i < p->startLocation + p->memSize; i++)
+    {
+        memory[i] = 0;
+    }
+    p->startLocation = -1;
 }

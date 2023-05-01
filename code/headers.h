@@ -73,6 +73,9 @@ struct Process
     int startTime;
     int waitingTime;
     int pId;
+    // for memory
+    int memSize;
+    int startLocation;
 };
 
 void Process__init(struct Process *self, int id, int ar, int run, int p)
@@ -306,95 +309,4 @@ int getAlgo()
 int getQuantum()
 {
     return quantum;
-}
-
-//=====================================================================
-//==================== Tree of buddy process management ===============
-//=====================================================================
-struct treeNode
-{
-    // id -1 for empty segment
-    // position 0 => root  1 => right  -1 => left
-    int id, start, size, position;
-    struct treeNode *right;
-    struct treeNode *left;
-    struct treeNode *parent;
-};
-
-struct treeNode *createTreeNode(int start, int size, int position, struct treeNode *parent)
-{
-    struct treeNode *tempNode;
-    tempNode = (struct treeNode *)malloc(sizeof(struct treeNode));
-    tempNode->start = start;
-    tempNode->size = size;
-    tempNode->position = position;
-    tempNode->parent = parent;
-    tempNode->left = NULL;
-    tempNode->right = NULL;
-    return tempNode;
-}
-
-struct treeNode *mergeAfterDeleting(struct treeNode *deleted)
-{
-    struct treeNode *nodeParent;
-    while (deleted->parent && deleted->id == -1)
-    {
-        nodeParent = deleted->parent;
-        if ((deleted->position == 1 && nodeParent->left->id == -1) ||
-            (deleted->position == -1 && nodeParent->right->id == -1)) // this is a right child
-        {
-            nodeParent->right = NULL;
-            nodeParent->left = NULL;
-            deleted = nodeParent;
-        }
-    }
-    return deleted;
-}
-
-int allocateMemory(struct treeNode *leaves[], int size, int pSize, int PID)
-{
-    // Get Best Fit
-    int bestIdx = -1;
-
-    for (int i = 0; i < size; i++)
-    {
-        if (pSize == leaves[i]->size)
-        {
-            bestIdx = i;
-            break;
-        }
-        else if (pSize < leaves[i]->size)
-        {
-            if (bestIdx == -1)
-                bestIdx = i;
-            else if (leaves[i]->size < leaves[bestIdx]->size)
-                bestIdx = i;
-        }
-    }
-
-    if (bestIdx == -1)
-    {
-        // No Empty Space
-        // Think about what you will do
-        return -1;
-    }
-    while (pSize <= leaves[bestIdx]->size / 2)
-    {
-        struct treeNode *l = createTreeNode(leaves[bestIdx]->start, leaves[bestIdx]->size / 2, -1, leaves[bestIdx]);
-        struct treeNode *r = createTreeNode(leaves[bestIdx]->start + leaves[bestIdx]->size / 2, 1, leaves[bestIdx]->size / 2, leaves[bestIdx]);
-        l->id = -1;
-        r->id = -1;
-        l->position = -1;
-        r->position = 1;
-        leaves[bestIdx]->left = l;
-        leaves[bestIdx]->right = r;
-
-        // add them to leaves array;
-        //  bestIdx=array.size()-2
-        // Think about how we will implement the array (you can declare with max size which is 1024 and use variable to indicate the actual size)
-    }
-    leaves[bestIdx]->id = PID;
-    size++;
-
-    return bestIdx;
 }

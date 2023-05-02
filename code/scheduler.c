@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
                 // printf("Delete: i am in if\n");
                 // do something
                 struct Process *pAdd;
-                pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority);
+                pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority,ttt->memSize);
                 // runningProcess->startTime = currentclk; //////////
                 // printf("Current time from addProcess here for Process %d is %d", pNew->id, currentclk);
                 printf("234 - currentClk = %d\n", getClk());
@@ -492,7 +492,7 @@ struct Process *reader(int shmid)
 
     // addProcess(tmpProcess);
 
-    // printf("Ismail  PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", tmpProcess->id, tmpProcess->executionTime, tmpProcess->arrivalTime, tmpProcess->priority, tmpProcess->remainingTime, tmpProcess->finishTime);
+    // printf("Ismail  PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d, Memory Size = %d\n", tmpProcess->id, tmpProcess->executionTime, tmpProcess->arrivalTime, tmpProcess->priority, tmpProcess->remainingTime, tmpProcess->finishTime,tmpProcess->memSize);
     // printf("Delete: I am going outside reader\n");
 
     return tmpProcess;

@@ -89,7 +89,7 @@ struct Process
     int startLocation;
 };
 
-void Process__init(struct Process *self, int id, int ar, int run, int p)
+void Process__init(struct Process *self, int id, int ar, int run, int p,int memsize)
 {
     self->arrivalTime = ar;
     self->priority = p;
@@ -102,6 +102,7 @@ void Process__init(struct Process *self, int id, int ar, int run, int p)
     self->startTime = -1;
     self->waitingTime = 0;
     self->pId = -1;
+    self->memSize=memsize;
 }
 
 void changecurrentstate(struct Process *self, char *s)
@@ -109,10 +110,10 @@ void changecurrentstate(struct Process *self, char *s)
     self->currentState = s;
 }
 
-struct Process *Process__create(int id, int ar, int run, int p)
+struct Process *Process__create(int id, int ar, int run, int p,int ms)
 {
     struct Process *result = (struct Process *)malloc(sizeof(struct Process));
-    Process__init(result, id, ar, run, p);
+    Process__init(result, id, ar, run, p,ms);
     return result;
 }
 

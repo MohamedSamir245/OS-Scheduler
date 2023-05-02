@@ -3,7 +3,7 @@
 void clearResources(int);
 void runScheduler(int, int, int);
 void runClk();
-void writer(int, int, int, int, int, int, int);
+void writer(int, int, int, int, int, int, int,int);
 
 int shmid;
 int schedulerShmId;
@@ -33,7 +33,7 @@ void runClk()
 }
 
 // Write Process data in a sharedMemory for the scheduler
-void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime)
+void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, int remainingTime,int memsize)
 {
     struct Process *shmaddr = (struct Process *)shmat(shmid, (void *)0, 0);
     if (shmaddr == -1)
@@ -44,7 +44,7 @@ void writer(int shmid, int id, int arrTime, int exTime, int P, int finishTime, i
 
     struct Process *tmpProcess;
 
-    tmpProcess = Process__create(id, arrTime, exTime, P);
+    tmpProcess = Process__create(id, arrTime, exTime, P,memsize);
 
     // tmpProcess.arrivalTime = arrTime;
     // tmpProcess.id = id;
@@ -98,16 +98,16 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    int id, arTime, runTime, Prio;
+    int id, arTime, runTime, Prio,memsize;
     // fgets(con, 1000, fp);
 
     int k = 0;
     int totalNumOfProcesses = 0;
-    while (fscanf(fp, "%d %d %d %d", &id, &arTime, &runTime, &Prio) == 4)
+    while (fscanf(fp, "%d %d %d %d %d", &id, &arTime, &runTime, &Prio,&memsize) == 5)
     {
-        printf("%d %d %d %d\n", id, arTime, runTime, Prio);
+        printf("%d %d %d %d %d\n", id, arTime, runTime, Prio,memsize);
 
-        processes[k++] = Process__create(id, arTime, runTime, Prio);
+        processes[k++] = Process__create(id, arTime, runTime, Prio,memsize);
         totalNumOfProcesses++;
 
         // here create a process and add it to the array
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     // printf("flakgkndk;jgna       %d", totalNumOfProcesses);
     for (int i = 0; i < k; i++)
     {
-        printf("PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d\n", processes[i]->id, processes[i]->executionTime, processes[i]->arrivalTime, processes[i]->priority, processes[i]->remainingTime, processes[i]->finishTime);
+        printf("PID = %d, ExTime = %d, Arrival Time = %d, Priority = %d, Remaining Time = %d, Finish Time = %d, Memory Size = %d\n", processes[i]->id, processes[i]->executionTime, processes[i]->arrivalTime, processes[i]->priority, processes[i]->remainingTime, processes[i]->finishTime,processes[i]->memSize);
     }
 
     // printf("%d", processes[0]->arrivalTime);
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
             {
                 printf("PID = %d, arrTime = %d will run now\n", processes[pIdx]->id, processes[pIdx]->arrivalTime);
                 // here we send it to the scheduler
-                writer(schedulerShmId, processes[pIdx]->id, processes[pIdx]->arrivalTime, processes[pIdx]->executionTime, processes[pIdx]->priority, processes[pIdx]->executionTime, processes[pIdx]->remainingTime);
+                writer(schedulerShmId, processes[pIdx]->id, processes[pIdx]->arrivalTime, processes[pIdx]->executionTime, processes[pIdx]->priority, processes[pIdx]->executionTime, processes[pIdx]->remainingTime,processes[pIdx]->memSize);
 
                 message.mtype = 1;
                 message.request = 1;

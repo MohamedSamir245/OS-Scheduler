@@ -30,6 +30,7 @@ void deallocateMemoryFF(struct Process *p);
 struct memUnit *create_mem_unit(int st, int sz, int f, struct memUnit *n, struct memUnit *pre);
 void divideUnit(struct memUnit *u);
 bool allocateMemoryBSA(struct memUnit *mem, struct Process *process);
+void deallocateMemoryBSA(struct memUnit *mem, struct Process *process);
 
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
@@ -429,6 +430,12 @@ void printMemoryLog(int time, int bytes, int pId, int i, int j)
     fprintf("At time %d allocated %d bytes for process %d from %d to %d\n", time, bytes, pId, i, j);
 }
 
+void printMemoryLog2(int time, int bytes, int pId, int i, int j)
+{
+    fprintf(memoryLog, "At time %d freed %d bytes for process %d from %d to %d\n", time, bytes, pId, i + 1, j + 1);
+    fprintf("At time %d allocated %d bytes for process %d from %d to %d\n", time, bytes, pId, i + 1, j + 1);
+}
+
 // Print line in scheduler.log
 // #At time x process y state arr w total z remain y wait k
 void printSchedulerLog(int time, int pId, char *state, int arr, int total, int remain, int wait)
@@ -564,6 +571,16 @@ void addProcess(struct Process *pNew)
 // Change process p state("resumed").
 void resumeProcess(struct Process *p)
 {
+    if (memAlgo == 1)
+    {
+        printMemoryLog(getClk(), p->memSize, p->id, p->startLocation, p->startLocation + p->memSize - 1);
+        allocateMemoryFF(p);
+    }
+    else
+    {
+        printMemoryLog(getClk(), p->memSize, p->id, p->startLocation, p->startLocation + p->memSize - 1);
+        //
+    }
     *processShmaddr = p->remainingTime;
     p->currentState = "resumed";
     kill(p->pId, SIGCONT);
@@ -573,6 +590,16 @@ void resumeProcess(struct Process *p)
 // Change process p state("stoped").
 void stopProcess(struct Process *p)
 {
+    if (memAlgo == 1)
+    {
+        // printMemoryLog2(getClk(), p->memSize, p->id, p->startLocation, p->startLocation - 1 + p->memSize); //-1 to eleminate +1 in the printMemoryLog2()
+        deallocateMemoryFF(p);
+    }
+    else
+    {
+        printMemoryLog2(getClk(), p->memSize, p->id, p->startLocation, p->startLocation - 1 + p->memSize);
+        //
+    }
     p->currentState = "stopped";
     kill(p->pId, SIGSTOP);
     printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
@@ -581,12 +608,6 @@ void stopProcess(struct Process *p)
 // Change process p state("finished").
 void finishProcess(struct Process *p)
 {
-
-    clcStat(p);
-    p->currentState = "finished";
-    printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
-    // Process__destroy(p); // TODO: Uncomment.
-    runningProcess = NULL;
     if (memAlgo == 1)
     {
         deallocateMemoryFF(p);
@@ -595,6 +616,12 @@ void finishProcess(struct Process *p)
     {
         // deallocate BSA
     }
+
+    clcStat(p);
+    p->currentState = "finished";
+    printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
+    // Process__destroy(p); // TODO: Uncomment.
+    runningProcess = NULL;
 }
 
 // Clc process p statistics (called on finish).
@@ -997,6 +1024,7 @@ bool allocateMemoryFF(struct Process *p)
 
 void deallocateMemoryFF(struct Process *p)
 {
+    printMemoryLog2(getClk(), p->memSize, p->id, p->startLocation - 1, p->startLocation + p->memSize - 2);
     for (int i = p->startLocation; i < p->startLocation + p->memSize; i++)
     {
         memory[i] = 0;
@@ -1090,4 +1118,8 @@ bool allocateMemoryBSA(struct memUnit *mem, struct Process *process)
 
     printf("memory allocated BSA\n");
     printMemoryLog(getClk(), process->startLocation, process->id, process->startLocation, process->startLocation + process->memSize - 1);
+}
+
+void deallocateMemoryBSA(struct memUnit *mem, struct Process *process)
+{
 }

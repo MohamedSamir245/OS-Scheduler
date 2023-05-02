@@ -13,9 +13,9 @@ void switch_HPF();  // Algo 1
 void switch_SRTN(); // Algo 2
 void switch_RR();   // Algo 3
 int runProcess(struct Process *);
-int stopProcess(struct Process *);
-int resumeProcess(struct Process *);
-int finishProcess(struct Process *);
+void stopProcess(struct Process *);
+void resumeProcess(struct Process *);
+void finishProcess(struct Process *);
 void printSchedulerPerf();
 void openSchedulerLog();
 void closeSchedulerLog();
@@ -24,6 +24,12 @@ void printSchedulerLog2(int, int, char *, int, int, int, int, int, double);
 void printQueue();
 void printRemainingTime();
 void increaseWaitTime();
+
+void allocateMemoryFF(struct Process *p);
+void deallocateMemoryFF(struct Process *p);
+struct memUnit *create_mem_unit(int st, int sz, int f, struct memUnit *n, struct memUnit *pre);
+void divideUnit(struct memUnit *u);
+void allocateMemoryBSA(struct memUnit *mem, struct Process *process);
 
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
@@ -56,7 +62,7 @@ int processShmid;
 int *processShmaddr;
 
 // For Memory
-int Memory[1024] = {0};
+int memory[1024] = {0};
 
 // ===============================================================================================
 // =====================================    Code   ===============================================
@@ -819,4 +825,91 @@ void deallocateMemoryFF(struct Process *p)
         memory[i] = 0;
     }
     p->startLocation = -1;
+}
+
+struct memUnit *create_mem_unit(int st, int sz, int f, struct memUnit *n, struct memUnit *pre)
+{
+    struct memUnit *unit = (struct memUnit *)malloc(sizeof(struct memUnit));
+
+    unit->startLoc = st;
+    unit->next = n;
+    unit->f = f;
+    unit->size = sz;
+    unit->previous = pre;
+
+    return unit;
+}
+
+void divideUnit(struct memUnit *u)
+{
+    u->size = u->size / 2;
+    struct memUnit *new = create_mem_unit(u->startLoc + u->size, u->size, 1, u->next, u);
+    u->next = new;
+}
+
+void allocateMemoryBSA(struct memUnit *mem, struct Process *process)
+{
+    int sz = process->memSize;
+    int bestIdx = -1;
+    int currIdx = 0;
+    int bestsz = -1;
+    struct memUnit *p;
+
+    p = mem;
+    while (p)
+    {
+        if (sz == p->size && p->f == 1)
+        {
+            bestIdx = currIdx;
+            break;
+        }
+        if (sz < p->size && p->f == 1)
+        {
+            if (bestsz = -1)
+            {
+                bestsz = p->size;
+                bestIdx = currIdx;
+            }
+            else if (p->size < bestsz)
+            {
+                bestsz = p->size;
+                bestIdx = currIdx;
+            }
+        }
+        currIdx++;
+        if (bestIdx == -1 && p->size >= sz && p->f == 1)
+        {
+            bestIdx = currIdx;
+        }
+        p = p->next;
+    }
+
+    if (bestIdx == -1)
+    {
+        if (p && p->size < sz || !p)
+            printf("Can't allocate memory BSA\n");
+
+        return;
+    }
+
+    struct memUnit *bestfit = mem;
+
+    for (int i = 0; i < bestIdx; i++)
+    {
+        bestfit = bestfit->next;
+    }
+
+    while (bestfit->size / 2 >= sz)
+    {
+        divideUnit(bestfit);
+    }
+
+    bestfit->f = 0;
+
+    for (int i = bestfit->startLoc; i < bestfit->startLoc + process->memSize; i++)
+    {
+        memory[i] = 1;
+    }
+
+    printf("memory allocated BSA\n");
 }

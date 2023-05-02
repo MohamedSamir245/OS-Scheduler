@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <math.h>
 
 typedef short bool;
 #define true 1
@@ -24,6 +25,16 @@ struct msgbuff
 {
     long mtype;
     int request;
+};
+
+struct memUnit
+{
+    int startLoc;
+    int size;
+    int f;
+
+    struct memUnit *next;
+    struct memUnit *previous;
 };
 
 // ============================

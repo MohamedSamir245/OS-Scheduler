@@ -12,17 +12,6 @@
 
 int main()
 {
-    // struct treeNode *root = (struct treeNode *)createTreeNode(0, 1024, 0, NULL);
-
-    // printf("%d\n", root->id);
-
-    // struct treeNode *array[1024];
-
-    // int currSize = 1;
-
-    // leaves[0] = root;
-    // printf("%d\n", leaves[0]->start);
-    // printf("%d\n", array[0]->size);
 
     int psize1 = 300;
     int psize2 = 200;
@@ -52,16 +41,6 @@ int main()
     allocateMemoryBSA(mem, p4);
 
     printf("here\n");
-
-    // printf("size: %d, pSize: %d\n", currSize, psize1);
-
-    // allocateMemory(array, currSize, psize1, 1);
-    // printf("size: %d, pSize: %d\n", currSize, psize1);
-
-    // printf("Allocated = %d, Now size is %d", allocateMemory(currSize, psize1, 1), currSize);
-    // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize2, 2), currSize);
-    // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize3, 3), currSize);
-    // printf("Allocated = %d, Now size is %d", allocateMemory(array, currSize, psize4, 4), currSize);
 
     return 0;
 }

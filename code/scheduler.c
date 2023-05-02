@@ -25,11 +25,11 @@ void printQueue();
 void printRemainingTime();
 void increaseWaitTime();
 
-void allocateMemoryFF(struct Process *p);
+bool allocateMemoryFF(struct Process *p);
 void deallocateMemoryFF(struct Process *p);
 struct memUnit *create_mem_unit(int st, int sz, int f, struct memUnit *n, struct memUnit *pre);
 void divideUnit(struct memUnit *u);
-void allocateMemoryBSA(struct memUnit *mem, struct Process *process);
+bool allocateMemoryBSA(struct memUnit *mem, struct Process *process);
 
 // ===============================================================================================
 // =====================================    Global Variables    ==================================
@@ -57,12 +57,16 @@ int RR_clock = 0;
 int prevAddedProcessId = -1;
 // For schedulerLog
 FILE *schedulerLog;
+// For schedulerLog
+FILE *memoryLog;
 // For process shared memory
 int processShmid;
 int *processShmaddr;
 
 // For Memory
 int memory[1024] = {0};
+int memAlgo;
+struct memUnit *mem = NULL;
 
 // ===============================================================================================
 // =====================================    Code   ===============================================
@@ -77,6 +81,9 @@ int main(int argc, char *argv[])
     // -----------------------      Some intial lines    --------------------------------
     // -----------------------                           --------------------------------
 
+    // memAlgo = atoi(argv[7]);
+    memAlgo = 1;
+    mem = create_mem_unit(0, 1024, 1, NULL, NULL);
     initClk();
 
     // algo = getAlgo();
@@ -109,6 +116,7 @@ int main(int argc, char *argv[])
     // ---------------------------------------------------------------
 
     openSchedulerLog();
+    openMemoryLog();
 
     int schedulerShmId = shmget(350, 128, IPC_CREAT | 0644);
     int mesq_id = msgget(250, 0666 | IPC_CREAT);
@@ -243,7 +251,7 @@ int main(int argc, char *argv[])
                 // printf("Delete: i am in if\n");
                 // do something
                 struct Process *pAdd;
-                pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority,ttt->memSize);
+                pAdd = Process__create(ttt->id, ttt->arrivalTime, ttt->executionTime, ttt->priority, ttt->memSize);
                 // runningProcess->startTime = currentclk; //////////
                 // printf("Current time from addProcess here for Process %d is %d", pNew->id, currentclk);
                 printf("234 - currentClk = %d\n", getClk());
@@ -319,6 +327,7 @@ int main(int argc, char *argv[])
 
     // }
     closeSchedulerLog();
+    closeMemoryLog();
     destroyClk(true);
 }
 
@@ -412,6 +421,14 @@ void printSchedulerPerf()
     fclose(schedulerPerf);
 }
 
+// Print line in memory.log
+// #At time x allocated y bytes for process z from I to j
+void printMemoryLog(int time, int bytes, int pId, int i, int j)
+{
+    fprintf(memoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", time, bytes, pId, i, j);
+    fprintf("At time %d allocated %d bytes for process %d from %d to %d\n", time, bytes, pId, i, j);
+}
+
 // Print line in scheduler.log
 // #At time x process y state arr w total z remain y wait k
 void printSchedulerLog(int time, int pId, char *state, int arr, int total, int remain, int wait)
@@ -432,6 +449,18 @@ void printSchedulerLog2(int time, int pId, char *state, int arr, int total, int 
 void openSchedulerLog()
 {
     schedulerLog = fopen("scheduler.log", "w");
+};
+
+// Creates memory.log file and opens it.
+void openMemoryLog()
+{
+    memoryLog = fopen("memory.log", "w");
+};
+
+// Closes memory.log file
+void closeMemoryLog()
+{
+    fclose(memoryLog);
 };
 
 // Closes scheduler.log file
@@ -558,6 +587,14 @@ void finishProcess(struct Process *p)
     printSchedulerLog2(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime, p->turnaroundTime, p->weightedTATime);
     // Process__destroy(p); // TODO: Uncomment.
     runningProcess = NULL;
+    if (memAlgo == 1)
+    {
+        deallocateMemoryFF(p);
+    }
+    else
+    {
+        // deallocate BSA
+    }
 }
 
 // Clc process p statistics (called on finish).
@@ -596,6 +633,23 @@ void switch_HPF()
         printf("remaining time = %d\n", runningProcess->remainingTime);
         if (runningProcess)
         {
+            if (memAlgo == 1)
+            {
+
+                if (!allocateMemoryFF(runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
+            else
+            {
+                if (!allocateMemoryBSA(mem, runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
             pop(&qHead);
             if (runningProcess->startTime == -1)
             {
@@ -615,7 +669,23 @@ void switch_HPF()
             printf("remaining time = %d\n", runningProcess->remainingTime);
             if (runningProcess)
             {
+                if (memAlgo == 1)
+                {
 
+                    if (!allocateMemoryFF(runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!allocateMemoryBSA(mem, runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
@@ -636,6 +706,23 @@ void switch_SRTN()
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
+            if (memAlgo == 1)
+            {
+
+                if (!allocateMemoryFF(runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
+            else
+            {
+                if (!allocateMemoryBSA(mem, runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
             pop(&qHead);
             if (runningProcess->startTime == -1)
             {
@@ -653,6 +740,23 @@ void switch_SRTN()
             stopProcess(runningProcess);
             addProcess(runningProcess);
             runningProcess = peek(&qHead);
+            if (memAlgo == 1)
+            {
+
+                if (!allocateMemoryFF(runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
+            else
+            {
+                if (!allocateMemoryBSA(mem, runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
             pop(&qHead);
             if (runningProcess->startTime == -1)
             {
@@ -672,6 +776,23 @@ void switch_SRTN()
             if (qHead && peek(&qHead))
             {
                 runningProcess = peek(&qHead);
+                if (memAlgo == 1)
+                {
+
+                    if (!allocateMemoryFF(runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!allocateMemoryBSA(mem, runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
@@ -696,6 +817,23 @@ void switch_RR()
         runningProcess = peek(&qHead);
         if (runningProcess)
         {
+            if (memAlgo == 1)
+            {
+
+                if (!allocateMemoryFF(runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
+            else
+            {
+                if (!allocateMemoryBSA(mem, runningProcess))
+                {
+                    runningProcess = NULL;
+                    return;
+                }
+            }
             pop(&qHead);
             if (runningProcess->startTime == -1)
             {
@@ -715,6 +853,23 @@ void switch_RR()
             runningProcess = peek(&qHead);
             if (runningProcess)
             {
+                if (memAlgo == 1)
+                {
+
+                    if (!allocateMemoryFF(runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!allocateMemoryBSA(mem, runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
@@ -740,6 +895,23 @@ void switch_RR()
             runningProcess = peek(&qHead);
             if (runningProcess)
             {
+                if (memAlgo == 1)
+                {
+
+                    if (!allocateMemoryFF(runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!allocateMemoryBSA(mem, runningProcess))
+                    {
+                        runningProcess = NULL;
+                        return;
+                    }
+                }
                 pop(&qHead);
                 if (runningProcess->startTime == -1)
                 {
@@ -777,11 +949,13 @@ int runProcess(struct Process *p)
     printSchedulerLog(currentclk, p->id, p->currentState, p->arrivalTime, p->executionTime, p->remainingTime, p->waitingTime);
     return p->pId;
 }
+// TODO pull from github
 
-void allocateMemoryFF(struct Process *p)
+bool allocateMemoryFF(struct Process *p)
 {
     int st = -1;
     int j, i;
+
     for (i = 0; i < 1024; i++)
     {
         if (memory[i] == 0)
@@ -811,10 +985,13 @@ void allocateMemoryFF(struct Process *p)
         p->startLocation = st;
 
         printf("Memory allocation FF done\n");
+        printMemoryLog(getClk(), p->memSize, p->id, p->startLocation, p->startLocation + p->memSize - 1);
+        return true;
     }
     else
     {
         printf("Memory allocation FF Failed\n");
+        return false;
     }
 }
 
@@ -847,7 +1024,7 @@ void divideUnit(struct memUnit *u)
     u->next = new;
 }
 
-void allocateMemoryBSA(struct memUnit *mem, struct Process *process)
+bool allocateMemoryBSA(struct memUnit *mem, struct Process *process)
 {
     int sz = process->memSize;
     int bestIdx = -1;
@@ -912,4 +1089,5 @@ void allocateMemoryBSA(struct memUnit *mem, struct Process *process)
     }
 
     printf("memory allocated BSA\n");
+    printMemoryLog(getClk(), process->startLocation, process->id, process->startLocation, process->startLocation + process->memSize - 1);
 }

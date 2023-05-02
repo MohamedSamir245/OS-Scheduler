@@ -1,0 +1,8 @@
+At time 12 allocated 25 bytes for process 1 from 0 to 24
+At time 41 allocated 49 bytes for process 8 from 0 to 48
+At time 58 allocated 200 bytes for process 9 from 0 to 199
+At time 83 allocated 45 bytes for process 3 from 0 to 44
+At time 109 allocated 200 bytes for process 6 from 0 to 199
+At time 111 allocated 20 bytes for process 2 from 0 to 19
+At time 113 allocated 100 bytes for process 4 from 0 to 99
+At time 133 allocated 250 bytes for process 10 from 0 to 249
